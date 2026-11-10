@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"siato_lms/internal/middleware"
@@ -36,7 +37,7 @@ func (r *Renderer) HTML(c *gin.Context, status int, page string, d Data) {
 			}
 		}
 		return false
-	}}).ParseFiles(files...)
+	}, "hasPrefix": strings.HasPrefix}).ParseFiles(files...)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "template error")
 		return

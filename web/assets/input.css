@@ -58,3 +58,11 @@
 .schedule-mode.onsite{@apply bg-emerald-50 text-emerald-600}
 .schedule-mode.online{@apply bg-violet-50 text-violet-600}
 .schedule-mode.hybrid{@apply bg-amber-50 text-amber-600}
+.class-card{@apply overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-xl hover:shadow-slate-200/60}
+.class-status{@apply ml-2 rounded-md px-2 py-1 text-[10px] font-bold}
+.class-status.active{@apply bg-emerald-50 text-emerald-600}.class-status.draft{@apply bg-amber-50 text-amber-600}.class-status.completed{@apply bg-slate-100 text-slate-600}.class-status.cancelled{@apply bg-red-50 text-red-600}
+.class-open{@apply flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700}
+.class-hero-stat{@apply min-w-20 rounded-xl border border-white/10 bg-white/10 px-3 py-3 text-center backdrop-blur}
+.class-hero-stat strong{@apply block text-lg}.class-hero-stat span{@apply mt-1 block text-[10px] text-blue-200}
+.class-tab{@apply flex items-center gap-2 border-b-2 px-4 py-4 text-sm font-semibold}.class-tab.active{@apply border-blue-600 text-blue-600}.class-tab.muted{@apply cursor-default border-transparent text-slate-400}
+.class-info{@apply rounded-xl border border-slate-100 bg-slate-50 p-4}.class-info span{@apply block text-xs text-slate-400}.class-info strong{@apply mt-1.5 block text-sm text-slate-800}

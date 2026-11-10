@@ -10,6 +10,10 @@ document.addEventListener('alpine:init', function () {
   Alpine.data('schedulePage', function () {
     return { scheduleModal: false };
   });
+
+  Alpine.data('classPage', function () {
+    return { classModal: false };
+  });
 });
 
 document.addEventListener('submit', function (event) {

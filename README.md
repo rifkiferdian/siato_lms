@@ -1,6 +1,6 @@
 # SIATO LMS
 
-LMS perguruan tinggi berbasis Go, Gin, GORM, MySQL, dan server-side rendered templates. Repository berisi fondasi Phase 1 dan modul jadwal kuliah: database akademik pendukung, filter jadwal berdasarkan kepesertaan kelas, serta pengelolaan jadwal oleh admin akademik.
+LMS perguruan tinggi berbasis Go, Gin, GORM, MySQL, dan server-side rendered templates. Repository berisi fondasi Phase 1, modul jadwal kuliah, dan modul kelas dengan filter akses berdasarkan kepesertaan serta pengampu.
 
 ## Menjalankan lokal
 
@@ -27,5 +27,5 @@ Set `COOKIE_SECURE=true` di balik HTTPS. Private storage tidak dipasang sebagai 
 
 ## Status roadmap
 
-- Selesai: fondasi Phase 1, login/logout, session, CSRF, RBAC dasar, migration/seed, dashboard, dan modul jadwal kuliah/mengajar.
+- Selesai: fondasi Phase 1, login/logout, session, CSRF, RBAC dasar, migration/seed, dashboard, modul jadwal kuliah/mengajar, daftar dan detail kelas.
 - Belum: CRUD master akademik (Phase 2), detail kelas/pertemuan, QR, materi/tugas, messaging, notification, laporan. Menu untuk fitur tersebut belum berupa route aktif sampai implementasinya tersedia.
