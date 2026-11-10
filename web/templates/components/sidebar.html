@@ -1,0 +1,28 @@
+{{define "sidebar"}}
+<div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden" @click="sidebar=false"></div>
+<aside :class="sidebar ? 'translate-x-0':'-translate-x-full'" class="dashboard-sidebar">
+  <div class="flex h-20 items-center justify-between border-b border-slate-100 px-6">
+    <a href="/dashboard" class="flex items-center gap-3 text-slate-900"><span class="grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-lg font-black text-white shadow-lg shadow-blue-200">S</span><span><strong class="block text-lg leading-none">SIATO</strong><span class="text-[9px] tracking-[.22em] text-blue-600">LEARNING SYSTEM</span></span></a>
+    <button @click="sidebar=false" class="text-slate-400 lg:hidden" aria-label="Tutup navigasi"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="mx-4 mt-5 rounded-xl border border-blue-100 bg-blue-50 p-3">
+      <p class="text-[10px] font-semibold uppercase tracking-wider text-blue-600">Semester aktif</p><div class="mt-1 flex items-center justify-between"><span class="text-sm font-semibold text-slate-800">Ganjil 2026/2027</span><i class="fa-regular fa-calendar text-blue-400"></i></div>
+    </div>
+    <nav class="p-4 text-sm">
+      <p class="sidebar-label">UTAMA</p>
+      {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<a class="sidebar-link active" href="/admin/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{else if hasRole .Roles "lecturer"}}<a class="sidebar-link active" href="/lecturer/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{else}}<a class="sidebar-link active" href="/student/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{end}}
+      {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/admin/schedules"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>{{else if hasRole .Roles "lecturer"}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/lecturer/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Mengajar</span></a>{{else}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/student/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>{{end}}
+      <div class="sidebar-item-muted"><i class="fa-solid fa-chalkboard"></i><span>Kelas Saya</span><small>Segera</small></div>
+      <p class="sidebar-label mt-6">PEMBELAJARAN</p>
+      <div class="sidebar-item-muted"><i class="fa-solid fa-book-open"></i><span>Materi</span></div>
+      <div class="sidebar-item-muted"><i class="fa-solid fa-list-check"></i><span>Tugas & Penilaian</span></div>
+      <div class="sidebar-item-muted"><i class="fa-solid fa-qrcode"></i><span>Presensi QR</span></div>
+      <p class="sidebar-label mt-6">KOMUNIKASI</p>
+      <div class="sidebar-item-muted"><i class="fa-regular fa-comments"></i><span>Diskusi Kelas</span></div>
+      <div class="sidebar-item-muted"><i class="fa-regular fa-bell"></i><span>Notifikasi</span></div>
+    </nav>
+  </div>
+  <div class="border-t border-slate-100 p-4"><div class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3"><span class="grid h-9 w-9 place-items-center rounded-lg bg-blue-100 text-blue-600"><i class="fa-solid fa-headset"></i></span><div><p class="text-xs font-semibold text-slate-700">Butuh bantuan?</p><p class="text-[10px] text-slate-400">Hubungi administrator</p></div></div></div>
+</aside>
+{{end}}

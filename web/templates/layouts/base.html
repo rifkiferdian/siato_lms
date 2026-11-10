@@ -1,0 +1,34 @@
+{{define "base.html"}}<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2563eb"><meta name="csrf-token" content="{{.CSRF}}"><title>{{.Title}} · {{.AppName}}</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/css/app.css"><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css"><script defer src="/static/js/app.js"></script><script defer src="/static/vendor/alpine/alpine.min.js"></script><script defer src="/static/vendor/sweetalert2/sweetalert2.all.min.js"></script></head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+{{if .Roles}}
+<div x-data="dashboardShell" class="min-h-screen">
+  {{template "sidebar" .}}
+  <div class="lg:pl-72">
+    <header class="dashboard-header">
+      <div class="flex items-center gap-3">
+        <button class="header-icon lg:hidden" @click="sidebar=true" aria-label="Buka navigasi"><i class="fa-solid fa-bars"></i></button>
+        <div><p class="text-xs font-medium text-slate-400">PORTAL AKADEMIK</p><p class="hidden text-sm font-semibold text-slate-700 sm:block">{{.Title}}</p></div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 md:flex"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>Sistem aktif</div>
+        <div class="relative"><button class="header-icon" aria-label="Notifikasi" title="Belum ada notifikasi"><i class="fa-regular fa-bell"></i></button></div>
+        <div class="relative ml-1" @click.outside="profile=false" @keydown.escape.window="profile=false">
+          <button type="button" @click.stop="profile=!profile" :aria-expanded="profile" class="account-trigger" aria-haspopup="menu" aria-controls="account-menu" aria-label="Buka menu akun">
+            <span class="user-avatar"><i class="fa-solid fa-user text-sm"></i></span>
+            <span class="hidden min-w-0 text-left sm:block"><strong class="block max-w-40 truncate text-sm text-slate-800">{{if .User}}{{.User.Name}}{{else}}Pengguna{{end}}</strong><span class="account-role">{{if hasRole .Roles "super_admin"}}Super Admin{{else if hasRole .Roles "academic_admin"}}Admin Akademik{{else if hasRole .Roles "lecturer"}}Dosen{{else}}Mahasiswa{{end}}</span></span>
+            <span class="hidden h-7 w-px bg-slate-200 sm:block"></span><i class="fa-solid fa-chevron-down hidden text-[10px] text-slate-400 transition-transform sm:block" :class="profile && 'rotate-180'"></i>
+          </button>
+          <div id="account-menu" role="menu" x-cloak x-show="profile" x-transition.origin.top.right class="profile-menu" style="display:none">
+            <div class="border-b border-slate-100 px-4 py-3"><p class="truncate text-sm font-semibold">{{.User.Name}}</p><p class="truncate text-xs text-slate-400">{{.User.Email}}</p></div>
+            <form action="/logout" method="post" class="p-2"><input type="hidden" name="_csrf" value="{{.CSRF}}"><button class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-arrow-right-from-bracket"></i>Keluar dari akun</button></form>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="min-h-[calc(100vh-8.5rem)] p-4 sm:p-6 lg:p-8">{{if .Error}}<div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{{.Error}}</div>{{end}}{{template "content" .}}</main>
+    <footer class="dashboard-footer"><p>© 2026 {{.AppName}}. Seluruh hak dilindungi.</p><div class="flex items-center gap-4"><span><i class="fa-solid fa-shield-halved mr-1.5 text-emerald-500"></i>Koneksi aman</span><span class="rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-600">v1.0.0</span></div></footer>
+  </div>
+</div>
+{{else}}{{template "content" .}}{{end}}
+</body></html>{{end}}

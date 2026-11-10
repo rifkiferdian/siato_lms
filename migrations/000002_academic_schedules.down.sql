@@ -1,0 +1,12 @@
+DELETE FROM role_has_permissions WHERE permission_id IN (SELECT id FROM permissions WHERE name IN ('schedules.view','schedules.manage'));
+DELETE FROM permissions WHERE name IN ('schedules.view','schedules.manage');
+DROP TABLE IF EXISTS class_schedules;
+DROP TABLE IF EXISTS class_students;
+DROP TABLE IF EXISTS class_lecturers;
+DROP TABLE IF EXISTS course_classes;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS lecturers;
+DROP TABLE IF EXISTS study_programs;
+DROP TABLE IF EXISTS semesters;
+DROP TABLE IF EXISTS academic_years;

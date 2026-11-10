@@ -1,0 +1,29 @@
+{{define "content"}}
+<div class="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+  <div><div class="mb-2 flex items-center gap-2 text-xs text-slate-400"><i class="fa-solid fa-house"></i><span>/</span><span>Dashboard</span></div><h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Halo, {{.User.Name}} <span class="inline-block origin-bottom-right animate-[wave_1.8s_ease-in-out_1]">👋</span></h1><p class="mt-2 text-sm text-slate-500">{{if hasRole .Roles "lecturer"}}Berikut ringkasan aktivitas mengajar Anda hari ini.{{else if hasRole .Roles "student"}}Tetap semangat! Berikut aktivitas perkuliahan Anda hari ini.{{else}}Pantau aktivitas akademik dan kondisi sistem dari satu tempat.{{end}}</p></div>
+  <div class="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600 shadow-sm"><i class="fa-regular fa-calendar text-blue-600"></i><time>10 November 2026</time></div>
+</div>
+
+<section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <article class="dashboard-stat"><div class="stat-top"><span class="dashboard-stat-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-chalkboard"></i></span><span class="stat-trend text-emerald-600"><i class="fa-solid fa-arrow-trend-up"></i> Aktif</span></div><p class="mt-5 text-sm font-medium text-slate-500">Kelas Aktif</p><div class="mt-1 flex items-end gap-2"><strong class="text-3xl text-slate-900">0</strong><span class="mb-1 text-xs text-slate-400">kelas</span></div></article>
+  <article class="dashboard-stat"><div class="stat-top"><span class="dashboard-stat-icon bg-violet-50 text-violet-600"><i class="fa-regular fa-calendar-check"></i></span><span class="stat-trend text-slate-400">Hari ini</span></div><p class="mt-5 text-sm font-medium text-slate-500">{{if hasRole .Roles "lecturer"}}Jadwal Mengajar{{else if hasRole .Roles "student"}}Jadwal Kuliah{{else}}Jadwal Aktif{{end}}</p><div class="mt-1 flex items-end gap-2"><strong class="text-3xl text-slate-900">0</strong><span class="mb-1 text-xs text-slate-400">agenda</span></div></article>
+  <article class="dashboard-stat"><div class="stat-top"><span class="dashboard-stat-icon bg-amber-50 text-amber-600"><i class="fa-solid fa-list-check"></i></span><span class="stat-trend text-amber-600">Perlu perhatian</span></div><p class="mt-5 text-sm font-medium text-slate-500">{{if hasRole .Roles "lecturer"}}Belum Dinilai{{else if hasRole .Roles "student"}}Tugas Berjalan{{else}}Aktivitas Tertunda{{end}}</p><div class="mt-1 flex items-end gap-2"><strong class="text-3xl text-slate-900">0</strong><span class="mb-1 text-xs text-slate-400">tugas</span></div></article>
+  <article class="dashboard-stat"><div class="stat-top"><span class="dashboard-stat-icon bg-emerald-50 text-emerald-600"><i class="fa-solid fa-chart-simple"></i></span><span class="stat-trend text-emerald-600">Baik</span></div><p class="mt-5 text-sm font-medium text-slate-500">{{if hasRole .Roles "student"}}Kehadiran{{else}}Partisipasi{{end}}</p><div class="mt-1 flex items-end gap-2"><strong class="text-3xl text-slate-900">0%</strong><span class="mb-1 text-xs text-slate-400">semester ini</span></div></article>
+</section>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,.75fr)]">
+  <section class="dashboard-card">
+    <div class="card-heading"><div><h2>Jadwal Hari Ini</h2><p>Agenda perkuliahan yang perlu diperhatikan</p></div><span class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">0 Agenda</span></div>
+    <div class="empty-dashboard"><span class="empty-dashboard-icon"><i class="fa-regular fa-calendar-xmark"></i></span><h3>Belum ada jadwal hari ini</h3><p>Jadwal akan muncul setelah data akademik dan kelas tersedia.</p></div>
+  </section>
+  <section class="dashboard-card">
+    <div class="card-heading"><div><h2>Aktivitas Terbaru</h2><p>Pembaruan akun Anda</p></div><i class="fa-solid fa-ellipsis text-slate-300"></i></div>
+    <div class="empty-dashboard min-h-56"><span class="empty-dashboard-icon small"><i class="fa-regular fa-clock"></i></span><h3>Belum ada aktivitas</h3><p>Aktivitas terbaru akan tercatat di sini.</p></div>
+  </section>
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="dashboard-card"><div class="card-heading"><div><h2>{{if hasRole .Roles "student"}}Deadline Tugas{{else}}Tugas & Penilaian{{end}}</h2><p>Ringkasan pekerjaan yang sedang berjalan</p></div><span class="text-amber-500"><i class="fa-regular fa-hourglass-half"></i></span></div><div class="flex items-center gap-4 px-6 py-7"><span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-500"><i class="fa-solid fa-clipboard-check"></i></span><div><p class="text-sm font-semibold text-slate-700">Semua tugas sudah tertangani</p><p class="mt-1 text-xs text-slate-400">Tugas baru akan tampil pada bagian ini.</p></div></div></section>
+  <section class="dashboard-card"><div class="card-heading"><div><h2>Pengumuman</h2><p>Informasi terbaru dari kampus</p></div><span class="text-blue-500"><i class="fa-solid fa-bullhorn"></i></span></div><div class="flex items-center gap-4 px-6 py-7"><span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-500"><i class="fa-regular fa-envelope-open"></i></span><div><p class="text-sm font-semibold text-slate-700">Belum ada pengumuman baru</p><p class="mt-1 text-xs text-slate-400">Informasi penting akan tampil pada bagian ini.</p></div></div></section>
+</div>
+{{end}}

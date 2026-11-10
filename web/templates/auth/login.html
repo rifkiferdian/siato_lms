@@ -1,0 +1,63 @@
+{{define "content"}}
+<main class="login-shell">
+  <section class="login-brand-panel" aria-label="Tentang SIATO LMS">
+    <div class="login-orb login-orb-one"></div>
+    <div class="login-orb login-orb-two"></div>
+    <div class="relative z-10 flex h-full flex-col">
+      <a href="/" class="inline-flex items-center gap-3 text-white" aria-label="SIATO LMS">
+        <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/15 text-lg font-bold ring-1 ring-white/25 backdrop-blur">S</span>
+        <span><strong class="block text-lg leading-none">SIATO</strong><span class="text-xs tracking-[.22em] text-blue-100">LEARNING SYSTEM</span></span>
+      </a>
+
+      <div class="my-auto max-w-xl py-14">
+        <span class="login-eyebrow"><i class="fa-solid fa-graduation-cap"></i> Platform Pembelajaran Terpadu</span>
+        <h1 class="mt-6 text-4xl font-bold leading-tight text-white lg:text-5xl">Belajar, berkolaborasi, dan berkembang bersama.</h1>
+        <p class="mt-5 max-w-lg text-base leading-7 text-blue-100/90">Satu ruang digital untuk menghubungkan mahasiswa, dosen, dan aktivitas akademik dengan pengalaman belajar yang lebih sederhana.</p>
+
+        <div class="mt-10 grid max-w-lg grid-cols-3 gap-3">
+          <div class="login-feature"><i class="fa-solid fa-book-open"></i><span>Materi<br>Terpusat</span></div>
+          <div class="login-feature"><i class="fa-solid fa-list-check"></i><span>Tugas<br>Terpantau</span></div>
+          <div class="login-feature"><i class="fa-solid fa-chart-line"></i><span>Progres<br>Terukur</span></div>
+        </div>
+      </div>
+
+      <p class="text-xs text-blue-200/80">© 2026 SIATO · Sistem Informasi Akademik Terpadu</p>
+    </div>
+  </section>
+
+  <section class="login-form-panel">
+    <div class="w-full max-w-md" x-data="loginForm">
+      <div class="mb-9 lg:hidden">
+        <div class="inline-flex items-center gap-3 text-blue-700"><span class="grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-lg font-bold text-white shadow-lg shadow-blue-200">S</span><span><strong class="block text-lg leading-none">SIATO</strong><span class="text-[10px] tracking-[.2em] text-slate-500">LEARNING SYSTEM</span></span></div>
+      </div>
+
+      <div class="mb-8">
+        <span class="text-sm font-semibold text-blue-600">SELAMAT DATANG KEMBALI</span>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Masuk ke akun Anda</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">Gunakan akun institusi yang telah terdaftar untuk melanjutkan.</p>
+      </div>
+
+      {{if .Error}}
+      <div class="mb-6 flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert"><i class="fa-solid fa-circle-exclamation mt-0.5"></i><span>{{.Error}}</span></div>
+      {{end}}
+
+      <form method="post" action="/login" class="space-y-5">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}">
+        <label class="block">
+          <span class="form-label">Alamat email</span>
+          <span class="login-input-wrap"><i class="fa-regular fa-envelope"></i><input class="login-input" type="email" name="email" autocomplete="username" required autofocus placeholder="nama@kampus.ac.id"></span>
+        </label>
+        <label class="block">
+          <span class="form-label">Kata sandi</span>
+          <span class="login-input-wrap"><i class="fa-solid fa-lock"></i><input class="login-input pr-12" :type="showPassword ? 'text' : 'password'" name="password" autocomplete="current-password" required minlength="8" placeholder="Masukkan kata sandi"><button type="button" class="password-toggle" @click="showPassword=!showPassword" :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"><i class="fa-regular" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i></button></span>
+        </label>
+        <div class="flex items-center gap-2 text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500"></i><span>Lupa kata sandi? Hubungi administrator akademik kampus.</span></div>
+        <button class="login-submit" type="submit"><span>Masuk ke LMS</span><i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+
+      <div class="mt-8 flex items-center gap-3 text-xs text-slate-400"><span class="h-px flex-1 bg-slate-200"></span><span>Akses aman dan terenkripsi</span><span class="h-px flex-1 bg-slate-200"></span></div>
+      <p class="mt-6 text-center text-xs leading-5 text-slate-400"><i class="fa-solid fa-shield-halved mr-1 text-emerald-500"></i> Akses hanya untuk sivitas akademika terdaftar.</p>
+    </div>
+  </section>
+</main>
+{{end}}

@@ -1,0 +1,4 @@
+import { cp, mkdir, copyFile } from 'node:fs/promises';
+await mkdir('web/static/vendor/fontawesome', {recursive:true}); await mkdir('web/static/vendor/alpine', {recursive:true}); await mkdir('web/static/vendor/sweetalert2', {recursive:true}); await mkdir('web/static/fonts', {recursive:true});
+await cp('node_modules/@fortawesome/fontawesome-free/css','web/static/vendor/fontawesome/css',{recursive:true}); await cp('node_modules/@fortawesome/fontawesome-free/webfonts','web/static/vendor/fontawesome/webfonts',{recursive:true});
+await copyFile('node_modules/@alpinejs/csp/dist/cdn.min.js','web/static/vendor/alpine/alpine.min.js'); await copyFile('node_modules/sweetalert2/dist/sweetalert2.all.min.js','web/static/vendor/sweetalert2/sweetalert2.all.min.js'); await copyFile('node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2','web/static/fonts/roboto.woff2');

@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@source "../templates/**/*.html";
+@font-face{font-family:Roboto;src:url('/static/fonts/roboto.woff2') format('woff2');font-display:swap}body{font-family:Roboto,ui-sans-serif,system-ui,sans-serif}.nav-link{@apply flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white}.nav-link i{@apply w-5 text-center}.form-label{@apply block text-sm font-medium mb-2}.form-input{@apply w-full rounded-lg border border-slate-300 px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500}.btn-primary{@apply rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2}.stat-card{@apply relative bg-white border border-slate-200 rounded-xl p-5}.stat-icon{@apply float-right w-11 h-11 rounded-xl grid place-items-center}
+
+.login-shell{@apply min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(480px,.95fr)]}
+.login-brand-panel{@apply relative hidden min-h-screen overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-slate-950 p-10 lg:block xl:p-14}
+.login-brand-panel:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+.login-orb{@apply absolute rounded-full blur-3xl}
+.login-orb-one{@apply -right-28 top-20 h-80 w-80 bg-cyan-400/20}
+.login-orb-two{@apply -bottom-32 left-20 h-96 w-96 bg-violet-500/20}
+.login-eyebrow{@apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-medium tracking-wide text-blue-100 backdrop-blur}
+.login-feature{@apply flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.07] p-3 text-sm font-medium text-white backdrop-blur}
+.login-feature i{@apply text-lg text-cyan-300}
+.login-form-panel{@apply flex min-h-screen items-center justify-center px-6 py-12 sm:px-10 lg:px-14 xl:px-24}
+.login-input-wrap{@apply relative flex items-center}
+.login-input-wrap>i{@apply pointer-events-none absolute left-4 text-slate-400}
+.login-input{@apply h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10}
+.password-toggle{@apply absolute right-1 grid h-10 w-10 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700}
+.login-submit{@apply flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-blue-600 px-5 font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 active:translate-y-0}
+
+[x-cloak]{display:none!important}
+.dashboard-sidebar{@apply fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-600 shadow-xl shadow-slate-200/40 transition-transform duration-300 lg:translate-x-0 lg:shadow-none}
+.sidebar-scroll{@apply flex-1 overflow-y-auto}
+.sidebar-label{@apply mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-slate-400}
+.sidebar-link{@apply mb-1 flex items-center gap-3 rounded-xl px-3 py-3 font-medium transition}
+.sidebar-link i,.sidebar-item-muted i{@apply w-5 text-center}
+.sidebar-link.active{@apply bg-blue-600 text-white shadow-lg shadow-blue-200}
+.sidebar-item-muted{@apply mb-1 flex cursor-default items-center gap-3 rounded-xl px-3 py-2.5 text-slate-400}
+.sidebar-item-muted small{@apply ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[9px] text-slate-400}
+.dashboard-header{@apply sticky top-0 z-30 flex h-20 items-center justify-between border-b-2 border-blue-600 bg-white/95 px-4 shadow-sm shadow-blue-100 backdrop-blur-xl sm:px-6 lg:px-8}
+.header-icon{@apply relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600}
+.user-avatar{@apply grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md shadow-blue-200}
+.account-trigger{@apply flex max-w-64 items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-1.5 pr-2.5 shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-md}
+.account-role{@apply mt-0.5 block w-fit rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-blue-600}
+.profile-menu{@apply absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70}
+.dashboard-footer{@apply relative flex flex-col gap-2 border-t-2 border-blue-600 bg-white px-6 py-5 text-xs text-slate-500 shadow-[0_-4px_16px_rgba(37,99,235,.06)] sm:flex-row sm:items-center sm:justify-between lg:px-8}
+.dashboard-stat{@apply rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg hover:shadow-slate-200/60}
+.stat-top{@apply flex items-start justify-between}
+.dashboard-stat-icon{@apply grid h-11 w-11 place-items-center rounded-xl text-lg}
+.stat-trend{@apply rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-semibold}
+.dashboard-card{@apply overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm}
+.card-heading{@apply flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6}
+.card-heading h2{@apply text-base font-bold text-slate-800}
+.card-heading p{@apply mt-1 text-xs text-slate-400}
+.empty-dashboard{@apply flex min-h-72 flex-col items-center justify-center px-6 py-10 text-center}
+.empty-dashboard-icon{@apply mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-slate-50 text-2xl text-slate-300 ring-8 ring-slate-50/60}
+.empty-dashboard-icon.small{@apply h-12 w-12 text-lg}
+.empty-dashboard h3{@apply text-sm font-semibold text-slate-700}
+.empty-dashboard p{@apply mt-1 max-w-sm text-xs leading-5 text-slate-400}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}}
+.schedule-day{@apply shrink-0 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 transition hover:bg-slate-50 hover:text-blue-600}
+.schedule-day.active{@apply bg-blue-600 text-white shadow-md shadow-blue-200 hover:bg-blue-700 hover:text-white}
+.schedule-row{@apply flex items-start gap-4 px-4 py-5 transition hover:bg-slate-50/70 sm:items-center sm:gap-6 sm:px-6}
+.schedule-date{@apply flex w-20 shrink-0 flex-col items-center overflow-hidden rounded-xl border border-blue-100 bg-blue-50 text-center}
+.schedule-date strong{@apply w-full bg-blue-600 px-2 py-1.5 text-xs text-white}
+.schedule-date span{@apply px-2 py-2 text-sm font-bold text-blue-700}
+.schedule-mode{@apply rounded-md px-2 py-1 text-[10px] font-bold}
+.schedule-mode.onsite{@apply bg-emerald-50 text-emerald-600}
+.schedule-mode.online{@apply bg-violet-50 text-violet-600}
+.schedule-mode.hybrid{@apply bg-amber-50 text-amber-600}
