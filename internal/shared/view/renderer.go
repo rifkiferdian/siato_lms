@@ -15,10 +15,10 @@ type Renderer struct {
 	appName string
 }
 type Data struct {
-	Title, AppName, CSRF, Error, Success string
-	User                                 any
-	Roles                                []string
-	Content                              any
+	Title, AppName, CSRF, Error, Success, CurrentPath string
+	User                                              any
+	Roles                                             []string
+	Content                                           any
 }
 
 func New(sm *middleware.SessionManager, root, appName string) *Renderer {
@@ -26,6 +26,7 @@ func New(sm *middleware.SessionManager, root, appName string) *Renderer {
 }
 func (r *Renderer) HTML(c *gin.Context, status int, page string, d Data) {
 	d.AppName = r.appName
+	d.CurrentPath = c.Request.URL.Path
 	d.CSRF, _ = r.sm.CSRF(c)
 	files := []string{filepath.Join(r.root, "layouts", "base.html"), filepath.Join(r.root, "components", "sidebar.html"), filepath.Join(r.root, filepath.FromSlash(page))}
 	t, err := template.New("base.html").Funcs(template.FuncMap{"hasRole": func(roles []string, target string) bool {

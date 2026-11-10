@@ -11,8 +11,16 @@
     </div>
     <nav class="p-4 text-sm">
       <p class="sidebar-label">UTAMA</p>
-      {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<a class="sidebar-link active" href="/admin/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{else if hasRole .Roles "lecturer"}}<a class="sidebar-link active" href="/lecturer/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{else}}<a class="sidebar-link active" href="/student/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>{{end}}
-      {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/admin/schedules"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>{{else if hasRole .Roles "lecturer"}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/lecturer/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Mengajar</span></a>{{else}}<a class="sidebar-link text-slate-600 hover:bg-slate-100" href="/student/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>{{end}}
+      {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}
+        <a class="sidebar-link {{if eq .CurrentPath "/admin/dashboard"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>
+        <a class="sidebar-link {{if eq .CurrentPath "/admin/schedules"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/schedules"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>
+      {{else if hasRole .Roles "lecturer"}}
+        <a class="sidebar-link {{if eq .CurrentPath "/lecturer/dashboard"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/lecturer/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>
+        <a class="sidebar-link {{if eq .CurrentPath "/lecturer/schedule"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/lecturer/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Mengajar</span></a>
+      {{else}}
+        <a class="sidebar-link {{if eq .CurrentPath "/student/dashboard"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/student/dashboard"><i class="fa-solid fa-table-cells-large"></i><span>Dashboard</span></a>
+        <a class="sidebar-link {{if eq .CurrentPath "/student/schedule"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/student/schedule"><i class="fa-regular fa-calendar"></i><span>Jadwal Kuliah</span></a>
+      {{end}}
       <div class="sidebar-item-muted"><i class="fa-solid fa-chalkboard"></i><span>Kelas Saya</span><small>Segera</small></div>
       <p class="sidebar-label mt-6">PEMBELAJARAN</p>
       <div class="sidebar-item-muted"><i class="fa-solid fa-book-open"></i><span>Materi</span></div>
