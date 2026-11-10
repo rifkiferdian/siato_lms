@@ -1,0 +1,10 @@
+ALTER TABLE students ADD COLUMN academic_status ENUM('active','leave','graduated','inactive') NOT NULL DEFAULT 'active' AFTER entry_year;
+ALTER TABLE students ADD COLUMN data_source ENUM('manual','siakad') NOT NULL DEFAULT 'manual' AFTER external_id;
+ALTER TABLE students ADD COLUMN last_synced_at DATETIME NULL AFTER data_source;
+ALTER TABLE lecturers ADD COLUMN academic_status ENUM('active','inactive','retired') NOT NULL DEFAULT 'active' AFTER employee_number;
+ALTER TABLE lecturers ADD COLUMN data_source ENUM('manual','siakad') NOT NULL DEFAULT 'manual' AFTER external_id;
+ALTER TABLE lecturers ADD COLUMN last_synced_at DATETIME NULL AFTER data_source;
+CREATE INDEX idx_students_status_source ON students(academic_status,data_source);
+CREATE INDEX idx_lecturers_status_source ON lecturers(academic_status,data_source);
+INSERT IGNORE INTO permissions(name,guard_name) VALUES ('students.view','web'),('students.manage','web'),('lecturers.view','web'),('lecturers.manage','web');
+INSERT IGNORE INTO role_has_permissions(permission_id,role_id) SELECT p.id,r.id FROM permissions p JOIN roles r WHERE r.name IN ('super_admin','academic_admin') AND p.name IN ('students.view','students.manage','lecturers.view','lecturers.manage');
