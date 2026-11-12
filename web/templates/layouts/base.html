@@ -26,7 +26,7 @@
         </div>
       </div>
     </header>
-    <main class="min-h-[calc(100vh-8.5rem)] p-4 sm:p-6 lg:p-8">{{if .Error}}<div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{{.Error}}</div>{{end}}{{template "content" .}}</main>
+    <main class="min-h-[calc(100vh-8.5rem)] p-4 sm:p-6 lg:p-8"><div class="mx-auto w-full max-w-[1440px]">{{if .Error}}<div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{{.Error}}</div>{{end}}{{template "content" .}}</div></main>
     <footer class="dashboard-footer"><p>© 2026 {{.AppName}}. Seluruh hak dilindungi.</p><div class="flex items-center gap-4"><span><i class="fa-solid fa-shield-halved mr-1.5 text-emerald-500"></i>Koneksi aman</span><span class="rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-600">v1.0.0</span></div></footer>
   </div>
 </div>
