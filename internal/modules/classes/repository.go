@@ -53,7 +53,7 @@ func (r *Repository) Detail(id, userID uint64, portal string) (ClassDetail, erro
 	e := r.db.Raw(q, args...).Take(&d).Error
 	return d, e
 }
-func (r *Repository) Students(classID uint64) ([]StudentRow, []Option, error) {
+func (r *Repository) Students(classID uint64) ([]StudentRow, []StudentOption, error) {
 	var students []StudentRow
 	err := r.db.Raw(`SELECT s.id,u.name,u.email,s.student_number,sp.name program_name
 FROM class_students cs JOIN students s ON s.id=cs.student_id JOIN users u ON u.id=s.user_id
@@ -61,8 +61,8 @@ JOIN study_programs sp ON sp.id=s.study_program_id WHERE cs.class_id=? ORDER BY 
 	if err != nil {
 		return nil, nil, err
 	}
-	var available []Option
-	err = r.db.Raw(`SELECT s.id,CONCAT(s.student_number,' · ',u.name,' · ',sp.code) label
+	var available []StudentOption
+	err = r.db.Raw(`SELECT s.id,s.entry_year,u.name,s.student_number,sp.name program_name
 FROM students s JOIN users u ON u.id=s.user_id JOIN study_programs sp ON sp.id=s.study_program_id
 WHERE u.is_active=1 AND NOT EXISTS(SELECT 1 FROM class_students cs WHERE cs.class_id=? AND cs.student_id=s.id)
 ORDER BY u.name`, classID).Scan(&available).Error

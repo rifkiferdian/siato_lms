@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"log/slog"
@@ -39,6 +40,24 @@ func main() {
 	tx.Exec("INSERT IGNORE INTO study_programs(code,name,degree,external_id) VALUES('IF','Informatika','S1','PRODI-IF')")
 	tx.Exec("INSERT IGNORE INTO lecturers(user_id,study_program_id,employee_number,external_id) SELECT u.id,p.id,'DSN001','LECT-001' FROM users u JOIN study_programs p ON p.code='IF' WHERE u.email='dosen@siato.test'")
 	tx.Exec("INSERT IGNORE INTO students(user_id,study_program_id,student_number,entry_year,external_id) SELECT u.id,p.id,'20260001',2026,'STU-001' FROM users u JOIN study_programs p ON p.code='IF' WHERE u.email='mahasiswa@siato.test'")
+	dummyStudents := []struct {
+		name, email, number string
+	}{
+		{"Andi Pratama", "andi.pratama@siato.test", "20260002"},
+		{"Bunga Lestari", "bunga.lestari@siato.test", "20260003"},
+		{"Cahya Nugraha", "cahya.nugraha@siato.test", "20260004"},
+		{"Dinda Maharani", "dinda.maharani@siato.test", "20260005"},
+		{"Eko Saputra", "eko.saputra@siato.test", "20260006"},
+		{"Farah Azzahra", "farah.azzahra@siato.test", "20260007"},
+		{"Galih Ramadhan", "galih.ramadhan@siato.test", "20260008"},
+		{"Hana Permata", "hana.permata@siato.test", "20260009"},
+		{"Iqbal Maulana", "iqbal.maulana@siato.test", "20260010"},
+	}
+	for index, student := range dummyStudents {
+		tx.Exec("INSERT INTO users(name,email,password_hash,is_active) VALUES(?,?,?,1) ON DUPLICATE KEY UPDATE name=VALUES(name)", student.name, student.email, string(hash))
+		tx.Exec("INSERT IGNORE INTO model_has_roles(role_id,user_id) SELECT r.id,u.id FROM roles r JOIN users u ON u.email=? WHERE r.name='student'", student.email)
+		tx.Exec("INSERT IGNORE INTO students(user_id,study_program_id,student_number,entry_year,external_id) SELECT u.id,p.id,?,2026,? FROM users u JOIN study_programs p ON p.code='IF' WHERE u.email=?", student.number, fmt.Sprintf("STU-%03d", index+2), student.email)
+	}
 	tx.Exec("INSERT IGNORE INTO courses(study_program_id,code,name,credits,external_id) SELECT id,'IF101','Algoritma dan Pemrograman',3,'COURSE-IF101' FROM study_programs WHERE code='IF'")
 	tx.Exec("INSERT IGNORE INTO courses(study_program_id,code,name,credits,external_id) SELECT id,'IF203','Basis Data',3,'COURSE-IF203' FROM study_programs WHERE code='IF'")
 	tx.Exec("INSERT IGNORE INTO courses(study_program_id,code,name,credits,external_id) SELECT id,'IF305','Rekayasa Perangkat Lunak',3,'COURSE-IF305' FROM study_programs WHERE code='IF'")

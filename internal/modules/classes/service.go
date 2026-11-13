@@ -31,7 +31,7 @@ func (s *Service) Detail(id, userID uint64, portal string) (ClassDetail, error) 
 	}
 	return s.repo.Detail(id, userID, portal)
 }
-func (s *Service) Students(classID uint64) ([]StudentRow, []Option, error) {
+func (s *Service) Students(classID uint64) ([]StudentRow, []StudentOption, error) {
 	if classID == 0 {
 		return nil, nil, gormErrNotFound
 	}

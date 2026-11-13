@@ -12,7 +12,7 @@ type Repository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
 func (r *Repository) Students(search, status, source string) ([]StudentRow, error) {
-	q := `SELECT s.id,s.user_id,u.name,u.email,u.is_active,s.student_number,s.entry_year,s.academic_status,s.data_source,COALESCE(s.external_id,'') external_id,COALESCE(DATE_FORMAT(s.last_synced_at,'%d/%m/%Y %H:%i'),'-') last_synced_at,p.code program_code,p.name program_name,(SELECT COUNT(*) FROM class_students cs WHERE cs.student_id=s.id) class_count FROM students s JOIN users u ON u.id=s.user_id JOIN study_programs p ON p.id=s.study_program_id WHERE 1=1`
+	q := `SELECT s.id,s.user_id,u.name,u.email,u.is_active,s.student_number,s.entry_year,s.academic_status,s.data_source,COALESCE(s.external_id,'') external_id,COALESCE(DATE_FORMAT(s.last_synced_at,'%d/%m/%Y %H:%i'),'-') last_synced_at,p.name program_code,p.code program_name,(SELECT COUNT(*) FROM class_students cs WHERE cs.student_id=s.id) class_count FROM students s JOIN users u ON u.id=s.user_id JOIN study_programs p ON p.id=s.study_program_id WHERE 1=1`
 	args := []any{}
 	if search != "" {
 		like := "%" + search + "%"
@@ -33,7 +33,7 @@ func (r *Repository) Students(search, status, source string) ([]StudentRow, erro
 	return rows, e
 }
 func (r *Repository) Lecturers(search, status, source string) ([]LecturerRow, error) {
-	q := `SELECT l.id,l.user_id,u.name,u.email,u.is_active,l.employee_number,l.academic_status,l.data_source,COALESCE(l.external_id,'') external_id,COALESCE(DATE_FORMAT(l.last_synced_at,'%d/%m/%Y %H:%i'),'-') last_synced_at,COALESCE(p.code,'-') program_code,COALESCE(p.name,'Belum ditentukan') program_name,(SELECT COUNT(*) FROM class_lecturers cl WHERE cl.lecturer_id=l.id) class_count FROM lecturers l JOIN users u ON u.id=l.user_id LEFT JOIN study_programs p ON p.id=l.study_program_id WHERE 1=1`
+	q := `SELECT l.id,l.user_id,u.name,u.email,u.is_active,l.employee_number,l.academic_status,l.data_source,COALESCE(l.external_id,'') external_id,COALESCE(DATE_FORMAT(l.last_synced_at,'%d/%m/%Y %H:%i'),'-') last_synced_at,COALESCE(p.name,'Belum ditentukan') program_code,COALESCE(p.code,'-') program_name,(SELECT COUNT(*) FROM class_lecturers cl WHERE cl.lecturer_id=l.id) class_count FROM lecturers l JOIN users u ON u.id=l.user_id LEFT JOIN study_programs p ON p.id=l.study_program_id WHERE 1=1`
 	args := []any{}
 	if search != "" {
 		like := "%" + search + "%"

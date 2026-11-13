@@ -9,6 +9,7 @@ import (
 	"siato_lms/internal/modules/rbac"
 	"siato_lms/internal/modules/users"
 	"siato_lms/internal/shared/view"
+	"sort"
 	"strconv"
 )
 
@@ -48,12 +49,25 @@ func (h *Handler) detail(c *gin.Context, portal, title string) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	data := DetailData{Portal: portal, Class: d, CanManage: portal == "admin", Success: c.Query("success"), Error: c.Query("error")}
+	tab := c.Query("tab")
+	if tab != "participants" {
+		tab = "overview"
+	}
+	data := DetailData{Portal: portal, Tab: tab, Class: d, CanManage: portal == "admin", Success: c.Query("success"), Error: c.Query("error")}
 	data.CanManageParticipants = portal == "admin" && canManageClassStudents(roles)
-	if data.CanManageParticipants {
+	if data.CanManageParticipants && data.Tab == "participants" {
 		data.Students, data.AvailableStudents, err = h.service.Students(classID)
 		if err != nil {
 			data.Error = "Data peserta belum dapat dimuat."
+		} else {
+			seenYears := map[uint16]bool{}
+			for _, student := range data.AvailableStudents {
+				if !seenYears[student.EntryYear] {
+					data.EntryYears = append(data.EntryYears, student.EntryYear)
+					seenYears[student.EntryYear] = true
+				}
+			}
+			sort.Slice(data.EntryYears, func(i, j int) bool { return data.EntryYears[i] > data.EntryYears[j] })
 		}
 	}
 	h.views.HTML(c, http.StatusOK, "classes/detail.html", view.Data{Title: title, Roles: roles, User: u, Content: data})
@@ -125,7 +139,7 @@ func (h *Handler) canManageClassStudents(c *gin.Context) bool {
 	return canManageClassStudents(roles)
 }
 func (h *Handler) redirectDetail(c *gin.Context, classID uint64, key, message string) {
-	c.Redirect(http.StatusSeeOther, "/admin/classes/"+strconv.FormatUint(classID, 10)+"?"+key+"="+url.QueryEscape(message))
+	c.Redirect(http.StatusSeeOther, "/admin/classes/"+strconv.FormatUint(classID, 10)+"?tab=participants&"+key+"="+url.QueryEscape(message))
 }
 func hasRole(roles []string, wanted string) bool {
 	for _, role := range roles {
