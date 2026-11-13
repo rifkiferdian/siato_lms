@@ -24,7 +24,7 @@ func main() {
 	for _, r := range roles {
 		tx.Exec("INSERT IGNORE INTO roles(name,guard_name) VALUES(?, 'web')", r)
 	}
-	perms := []string{"admin.dashboard", "lecturer.dashboard", "student.dashboard", "classes.view", "classes.manage", "materials.view", "materials.create", "materials.update", "assignments.create", "assignments.submit", "assignments.grade", "attendance.open", "attendance.scan", "attendance.manage", "messaging.send", "announcements.create", "reports.view"}
+	perms := []string{"admin.dashboard", "lecturer.dashboard", "student.dashboard", "classes.view", "classes.manage", "materials.view", "materials.create", "materials.update", "assignments.create", "assignments.submit", "assignments.grade", "attendance.open", "attendance.scan", "attendance.manage", "messaging.send", "announcements.create", "reports.view", "users.view", "users.manage", "roles.view", "roles.manage"}
 	for _, p := range perms {
 		tx.Exec("INSERT IGNORE INTO permissions(name,guard_name) VALUES(?, 'web')", p)
 	}

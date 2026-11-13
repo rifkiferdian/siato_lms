@@ -2,12 +2,12 @@
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2563eb"><meta name="csrf-token" content="{{.CSRF}}"><title>{{.Title}} · {{.AppName}}</title><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/css/app.css"><link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css"><script defer src="/static/js/app.js"></script><script defer src="/static/vendor/alpine/alpine.min.js"></script><script defer src="/static/vendor/sweetalert2/sweetalert2.all.min.js"></script></head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 {{if .Roles}}
-<div x-data="dashboardShell" class="min-h-screen">
+<div x-data="dashboardShell" @keydown.escape.window="closeSidebar" class="min-h-screen">
   {{template "sidebar" .}}
   <div class="lg:pl-72">
     <header class="dashboard-header">
       <div class="flex items-center gap-3">
-        <button class="header-icon lg:hidden" @click="sidebar=true" aria-label="Buka navigasi"><i class="fa-solid fa-bars"></i></button>
+        <button type="button" class="header-icon lg:hidden" @click="openSidebar" :aria-expanded="sidebar" aria-controls="dashboard-sidebar" aria-label="Buka navigasi"><i class="fa-solid fa-bars"></i></button>
         <div><p class="text-xs font-medium text-slate-400">PORTAL AKADEMIK</p><p class="hidden text-sm font-semibold text-slate-700 sm:block">{{.Title}}</p></div>
       </div>
       <div class="flex items-center gap-2 sm:gap-3">

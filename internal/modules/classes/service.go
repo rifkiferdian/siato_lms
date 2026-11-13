@@ -6,6 +6,10 @@ import (
 )
 
 var ErrClassHasStudents = errors.New("kelas yang memiliki peserta tidak dapat dihapus")
+var ErrClassFull = errors.New("kapasitas kelas tidak mencukupi")
+var ErrInvalidStudent = errors.New("mahasiswa tidak valid atau akun tidak aktif")
+var ErrStudentAlreadyEnrolled = errors.New("mahasiswa sudah terdaftar di kelas")
+var ErrEnrollmentNotFound = errors.New("peserta kelas tidak ditemukan")
 
 type Service struct{ repo *Repository }
 
@@ -26,6 +30,31 @@ func (s *Service) Detail(id, userID uint64, portal string) (ClassDetail, error) 
 		return ClassDetail{}, gormErrNotFound
 	}
 	return s.repo.Detail(id, userID, portal)
+}
+func (s *Service) Students(classID uint64) ([]StudentRow, []Option, error) {
+	if classID == 0 {
+		return nil, nil, gormErrNotFound
+	}
+	return s.repo.Students(classID)
+}
+func (s *Service) AddStudents(classID uint64, studentIDs []uint64) error {
+	if classID == 0 || len(studentIDs) == 0 {
+		return errors.New("pilih minimal satu mahasiswa")
+	}
+	seen := make(map[uint64]bool, len(studentIDs))
+	for _, id := range studentIDs {
+		if id == 0 || seen[id] {
+			return ErrInvalidStudent
+		}
+		seen[id] = true
+	}
+	return s.repo.AddStudents(classID, studentIDs)
+}
+func (s *Service) RemoveStudent(classID, studentID uint64) error {
+	if classID == 0 || studentID == 0 {
+		return ErrEnrollmentNotFound
+	}
+	return s.repo.RemoveStudent(classID, studentID)
 }
 func (s *Service) Create(in CreateInput) error {
 	in.Name = strings.TrimSpace(in.Name)

@@ -1,6 +1,11 @@
 document.addEventListener('alpine:init', function () {
   Alpine.data('dashboardShell', function () {
-    return { sidebar: false, profile: false };
+    return {
+      sidebar: false,
+      profile: false,
+      openSidebar() { this.sidebar = true; },
+      closeSidebar() { this.sidebar = false; }
+    };
   });
 
   Alpine.data('loginForm', function () {
@@ -17,6 +22,10 @@ document.addEventListener('alpine:init', function () {
 
   Alpine.data('peoplePage', function () {
     return { personModal: false };
+  });
+
+  Alpine.data('userManagementPage', function () {
+    return { createUserModal: false };
   });
 });
 

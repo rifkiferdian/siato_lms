@@ -53,6 +53,65 @@ func (r *Repository) Detail(id, userID uint64, portal string) (ClassDetail, erro
 	e := r.db.Raw(q, args...).Take(&d).Error
 	return d, e
 }
+func (r *Repository) Students(classID uint64) ([]StudentRow, []Option, error) {
+	var students []StudentRow
+	err := r.db.Raw(`SELECT s.id,u.name,u.email,s.student_number,sp.name program_name
+FROM class_students cs JOIN students s ON s.id=cs.student_id JOIN users u ON u.id=s.user_id
+JOIN study_programs sp ON sp.id=s.study_program_id WHERE cs.class_id=? ORDER BY u.name`, classID).Scan(&students).Error
+	if err != nil {
+		return nil, nil, err
+	}
+	var available []Option
+	err = r.db.Raw(`SELECT s.id,CONCAT(s.student_number,' · ',u.name,' · ',sp.code) label
+FROM students s JOIN users u ON u.id=s.user_id JOIN study_programs sp ON sp.id=s.study_program_id
+WHERE u.is_active=1 AND NOT EXISTS(SELECT 1 FROM class_students cs WHERE cs.class_id=? AND cs.student_id=s.id)
+ORDER BY u.name`, classID).Scan(&available).Error
+	return students, available, err
+}
+func (r *Repository) AddStudents(classID uint64, studentIDs []uint64) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var capacity, enrolled int
+		if err := tx.Raw("SELECT capacity FROM course_classes WHERE id=? FOR UPDATE", classID).Scan(&capacity).Error; err != nil {
+			return err
+		}
+		if capacity == 0 {
+			return gormErrNotFound
+		}
+		if err := tx.Raw("SELECT COUNT(*) FROM class_students WHERE class_id=?", classID).Scan(&enrolled).Error; err != nil {
+			return err
+		}
+		if enrolled+len(studentIDs) > capacity {
+			return ErrClassFull
+		}
+		var valid int64
+		if err := tx.Table("students s").Joins("JOIN users u ON u.id=s.user_id").Where("s.id IN ? AND u.is_active=1", studentIDs).Count(&valid).Error; err != nil {
+			return err
+		}
+		if int(valid) != len(studentIDs) {
+			return ErrInvalidStudent
+		}
+		for _, studentID := range studentIDs {
+			result := tx.Exec("INSERT IGNORE INTO class_students(class_id,student_id) VALUES(?,?)", classID, studentID)
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected == 0 {
+				return ErrStudentAlreadyEnrolled
+			}
+		}
+		return nil
+	})
+}
+func (r *Repository) RemoveStudent(classID, studentID uint64) error {
+	result := r.db.Exec("DELETE FROM class_students WHERE class_id=? AND student_id=?", classID, studentID)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrEnrollmentNotFound
+	}
+	return nil
+}
 func (r *Repository) Options() ([]Option, []Option, error) {
 	var courses, semesters []Option
 	e := r.db.Raw("SELECT id,CONCAT(code,' · ',name) label FROM courses ORDER BY name").Scan(&courses).Error

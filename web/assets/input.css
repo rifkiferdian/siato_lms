@@ -2,6 +2,10 @@
 @source "../templates/**/*.html";
 @font-face{font-family:Roboto;src:url('/static/fonts/roboto.woff2') format('woff2');font-display:swap}body{font-family:Roboto,ui-sans-serif,system-ui,sans-serif}.nav-link{@apply flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white}.nav-link i{@apply w-5 text-center}.form-label{@apply block text-sm font-medium mb-2}.form-input{@apply w-full rounded-lg border border-slate-300 px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500}.btn-primary{@apply rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2}.stat-card{@apply relative bg-white border border-slate-200 rounded-xl p-5}.stat-icon{@apply float-right w-11 h-11 rounded-xl grid place-items-center}
 
+/* Keep icon-bearing search fields clear of their leading icon. The compound
+   selector also outranks the base form-input horizontal padding. */
+.form-input.pl-11{padding-left:calc(var(--spacing)*11)}
+
 .login-shell{@apply min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(480px,.95fr)]}
 .login-brand-panel{@apply relative hidden min-h-screen overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-slate-950 p-10 lg:block xl:p-14}
 .login-brand-panel:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
@@ -20,7 +24,9 @@
 
 [x-cloak]{display:none!important}
 .dashboard-sidebar{@apply fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-600 shadow-xl shadow-slate-200/40 transition-transform duration-300 lg:translate-x-0 lg:shadow-none}
-.sidebar-scroll{@apply flex-1 overflow-y-auto}
+.dashboard-sidebar.sidebar-open{translate:0}
+.sidebar-scroll{@apply flex-1 overflow-y-auto;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.sidebar-scroll::-webkit-scrollbar{display:none;width:0;height:0}
 .sidebar-label{@apply mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-slate-400}
 .sidebar-link{@apply mb-1 flex items-center gap-3 rounded-xl px-3 py-3 font-medium transition}
 .sidebar-link i,.sidebar-item-muted i{@apply w-5 text-center}

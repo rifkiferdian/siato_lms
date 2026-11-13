@@ -14,7 +14,11 @@ type PageData struct {
 }
 
 type DetailData struct {
-	Portal    string
-	Class     ClassDetail
-	CanManage bool
+	Portal                string
+	Class                 ClassDetail
+	CanManage             bool
+	CanManageParticipants bool
+	Students              []StudentRow
+	AvailableStudents     []Option
+	Success, Error        string
 }

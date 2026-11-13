@@ -16,3 +16,8 @@ type Option struct {
 	ID    uint64
 	Label string
 }
+
+type StudentRow struct {
+	ID                                      uint64
+	Name, Email, StudentNumber, ProgramName string
+}

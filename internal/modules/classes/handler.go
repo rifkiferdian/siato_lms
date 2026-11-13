@@ -48,7 +48,15 @@ func (h *Handler) detail(c *gin.Context, portal, title string) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	h.views.HTML(c, http.StatusOK, "classes/detail.html", view.Data{Title: title, Roles: roles, User: u, Content: DetailData{Portal: portal, Class: d, CanManage: portal == "admin"}})
+	data := DetailData{Portal: portal, Class: d, CanManage: portal == "admin", Success: c.Query("success"), Error: c.Query("error")}
+	data.CanManageParticipants = portal == "admin" && canManageClassStudents(roles)
+	if data.CanManageParticipants {
+		data.Students, data.AvailableStudents, err = h.service.Students(classID)
+		if err != nil {
+			data.Error = "Data peserta belum dapat dimuat."
+		}
+	}
+	h.views.HTML(c, http.StatusOK, "classes/detail.html", view.Data{Title: title, Roles: roles, User: u, Content: data})
 }
 func (h *Handler) Admin(c *gin.Context)          { h.page(c, "admin", "Kelola Kelas") }
 func (h *Handler) Lecturer(c *gin.Context)       { h.page(c, "lecturer", "Kelas Saya") }
@@ -75,4 +83,59 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 	c.Redirect(http.StatusSeeOther, "/admin/classes?success="+url.QueryEscape("Kelas berhasil dihapus"))
+}
+func (h *Handler) AddStudents(c *gin.Context) {
+	if !h.canManageClassStudents(c) {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	values := c.PostFormArray("student_ids")
+	studentIDs := make([]uint64, 0, len(values))
+	for _, value := range values {
+		id, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			h.redirectDetail(c, classID, "error", "Pilihan mahasiswa tidak valid")
+			return
+		}
+		studentIDs = append(studentIDs, id)
+	}
+	if err := h.service.AddStudents(classID, studentIDs); err != nil {
+		h.redirectDetail(c, classID, "error", err.Error())
+		return
+	}
+	h.redirectDetail(c, classID, "success", "Mahasiswa berhasil ditambahkan ke kelas")
+}
+func (h *Handler) RemoveStudent(c *gin.Context) {
+	if !h.canManageClassStudents(c) {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	studentID, _ := strconv.ParseUint(c.Param("studentID"), 10, 64)
+	if err := h.service.RemoveStudent(classID, studentID); err != nil {
+		h.redirectDetail(c, classID, "error", err.Error())
+		return
+	}
+	h.redirectDetail(c, classID, "success", "Mahasiswa berhasil dikeluarkan dari kelas")
+}
+func (h *Handler) canManageClassStudents(c *gin.Context) bool {
+	id, _ := h.sm.UserID(c)
+	roles, _ := h.roles.Roles(id)
+	return canManageClassStudents(roles)
+}
+func (h *Handler) redirectDetail(c *gin.Context, classID uint64, key, message string) {
+	c.Redirect(http.StatusSeeOther, "/admin/classes/"+strconv.FormatUint(classID, 10)+"?"+key+"="+url.QueryEscape(message))
+}
+func hasRole(roles []string, wanted string) bool {
+	for _, role := range roles {
+		if role == wanted {
+			return true
+		}
+	}
+	return false
+}
+
+func canManageClassStudents(roles []string) bool {
+	return hasRole(roles, "academic_admin") || hasRole(roles, "super_admin")
 }

@@ -12,6 +12,8 @@ func RegisterRoutes(r *gin.Engine, h *Handler, sm *middleware.SessionManager, ro
 	g.GET("/admin/classes", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.Admin)
 	g.POST("/admin/classes", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.Create)
 	g.GET("/admin/classes/:id", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.AdminDetail)
+	g.POST("/admin/classes/:id/students", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.AddStudents)
+	g.POST("/admin/classes/:id/students/:studentID/delete", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.RemoveStudent)
 	g.POST("/admin/classes/:id/delete", middleware.RequirePermission(roles.HasPermission, "classes.manage"), h.Delete)
 	g.GET("/lecturer/classes", middleware.RequirePermission(roles.HasPermission, "classes.view"), h.Lecturer)
 	g.GET("/lecturer/classes/:id", middleware.RequirePermission(roles.HasPermission, "classes.view"), h.LecturerDetail)

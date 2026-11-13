@@ -16,6 +16,7 @@ import (
 	"siato_lms/internal/modules/people"
 	"siato_lms/internal/modules/rbac"
 	"siato_lms/internal/modules/schedules"
+	"siato_lms/internal/modules/usermanagement"
 	"siato_lms/internal/shared/view"
 )
 
@@ -54,6 +55,8 @@ func main() {
 	classes.RegisterRoutes(r, classHandler, sm, rbacService)
 	peopleHandler := people.NewHandler(people.NewService(people.NewRepository(db)), rbacService, sm, views, db)
 	people.RegisterRoutes(r, peopleHandler, sm, rbacService)
+	userManagementHandler := usermanagement.NewHandler(usermanagement.NewService(usermanagement.NewRepository(db)), rbacService, sm, views, db)
+	usermanagement.RegisterRoutes(r, userManagementHandler, sm, rbacService)
 	r.GET("/", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/dashboard") })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
 	server := &http.Server{Addr: cfg.Address, Handler: r, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}

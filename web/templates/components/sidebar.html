@@ -1,9 +1,9 @@
 {{define "sidebar"}}
-<div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden" @click="sidebar=false"></div>
-<aside :class="sidebar ? 'translate-x-0':'-translate-x-full'" class="dashboard-sidebar">
+<div x-show="sidebar" x-cloak x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden" @click="closeSidebar"></div>
+<aside id="dashboard-sidebar" :class="sidebar ? 'sidebar-open' : ''" class="dashboard-sidebar" aria-label="Navigasi utama">
   <div class="flex h-20 items-center justify-between border-b border-slate-100 px-6">
     <a href="/dashboard" class="flex items-center gap-3 text-slate-900"><span class="grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-lg font-black text-white shadow-lg shadow-blue-200">S</span><span><strong class="block text-lg leading-none">SIATO</strong><span class="text-[9px] tracking-[.22em] text-blue-600">LEARNING SYSTEM</span></span></a>
-    <button @click="sidebar=false" class="text-slate-400 lg:hidden" aria-label="Tutup navigasi"><i class="fa-solid fa-xmark"></i></button>
+    <button type="button" @click="closeSidebar" class="text-slate-400 lg:hidden" aria-label="Tutup navigasi"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <div class="sidebar-scroll">
     <div class="mx-4 mt-5 rounded-xl border border-blue-100 bg-blue-50 p-3">
@@ -23,6 +23,7 @@
       {{end}}
       {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<a class="sidebar-link {{if hasPrefix .CurrentPath "/admin/classes"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/classes"><i class="fa-solid fa-chalkboard"></i><span>Kelola Kelas</span></a>{{else if hasRole .Roles "lecturer"}}<a class="sidebar-link {{if hasPrefix .CurrentPath "/lecturer/classes"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/lecturer/classes"><i class="fa-solid fa-chalkboard"></i><span>Kelas Saya</span></a>{{else}}<a class="sidebar-link {{if hasPrefix .CurrentPath "/student/classes"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/student/classes"><i class="fa-solid fa-chalkboard"></i><span>Kelas Saya</span></a>{{end}}
       {{if or (hasRole .Roles "super_admin") (hasRole .Roles "academic_admin")}}<p class="sidebar-label mt-6">MASTER DATA</p><a class="sidebar-link {{if hasPrefix .CurrentPath "/admin/students"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/students"><i class="fa-solid fa-user-graduate"></i><span>Mahasiswa</span></a><a class="sidebar-link {{if hasPrefix .CurrentPath "/admin/lecturers"}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/lecturers"><i class="fa-solid fa-user-tie"></i><span>Dosen</span></a>{{end}}
+      {{if hasRole .Roles "super_admin"}}<p class="sidebar-label mt-6">SISTEM</p><a class="sidebar-link {{if or (hasPrefix .CurrentPath "/admin/users") (hasPrefix .CurrentPath "/admin/roles")}}active{{else}}text-slate-600 hover:bg-slate-100{{end}}" href="/admin/users"><i class="fa-solid fa-users-gear"></i><span>User Management</span></a>{{end}}
       <p class="sidebar-label mt-6">PEMBELAJARAN</p>
       <div class="sidebar-item-muted"><i class="fa-solid fa-book-open"></i><span>Materi</span></div>
       <div class="sidebar-item-muted"><i class="fa-solid fa-list-check"></i><span>Tugas & Penilaian</span></div>
