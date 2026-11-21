@@ -1,9 +1,9 @@
 package usermanagement
 
 type UserRow struct {
-	ID                                         uint64
-	Name, Email, Roles, CreatedAt, LastLoginAt string
-	IsActive                                   bool
+	ID                                                       uint64
+	Name, Email, Roles, AcademicType, CreatedAt, LastLoginAt string
+	IsActive                                                 bool
 }
 
 type RoleRow struct {

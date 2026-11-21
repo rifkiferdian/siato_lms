@@ -14,4 +14,16 @@ type PageData struct {
 	Students                                     []StudentRow
 	Lecturers                                    []LecturerRow
 	Programs                                     []ProgramOption
+	Pagination                                   Pagination
+	Stats                                        PeopleStats
+}
+
+type PeopleStats struct {
+	Total, Active, Inactive, SIAKAD, Manual int
+}
+
+type Pagination struct {
+	Page, PerPage, Total, TotalPages, From, To, PrevPage, NextPage int
+	HasPrev, HasNext                                               bool
+	Pages                                                          []int
 }

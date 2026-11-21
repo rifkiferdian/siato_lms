@@ -33,8 +33,9 @@ func (h *Handler) identity(c *gin.Context) ([]string, users.User) {
 }
 func (h *Handler) Students(c *gin.Context) {
 	roles, u := h.identity(c)
-	rows, programs, e := h.service.Students(c.Query("q"), c.Query("status"), c.Query("source"))
-	p := PageData{Kind: "student", Search: c.Query("q"), Status: c.Query("status"), Source: c.Query("source"), Students: rows, Programs: programs, Success: c.Query("success"), Error: c.Query("error")}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	rows, programs, pagination, stats, e := h.service.Students(c.Query("q"), c.Query("status"), c.Query("source"), page)
+	p := PageData{Kind: "student", Search: c.Query("q"), Status: c.Query("status"), Source: c.Query("source"), Students: rows, Programs: programs, Pagination: pagination, Stats: stats, Success: c.Query("success"), Error: c.Query("error")}
 	if e != nil {
 		p.Error = "Data mahasiswa belum dapat dimuat."
 	}
@@ -42,8 +43,9 @@ func (h *Handler) Students(c *gin.Context) {
 }
 func (h *Handler) Lecturers(c *gin.Context) {
 	roles, u := h.identity(c)
-	rows, programs, e := h.service.Lecturers(c.Query("q"), c.Query("status"), c.Query("source"))
-	p := PageData{Kind: "lecturer", Search: c.Query("q"), Status: c.Query("status"), Source: c.Query("source"), Lecturers: rows, Programs: programs, Success: c.Query("success"), Error: c.Query("error")}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	rows, programs, pagination, stats, e := h.service.Lecturers(c.Query("q"), c.Query("status"), c.Query("source"), page)
+	p := PageData{Kind: "lecturer", Search: c.Query("q"), Status: c.Query("status"), Source: c.Query("source"), Lecturers: rows, Programs: programs, Pagination: pagination, Stats: stats, Success: c.Query("success"), Error: c.Query("error")}
 	if e != nil {
 		p.Error = "Data dosen belum dapat dimuat."
 	}

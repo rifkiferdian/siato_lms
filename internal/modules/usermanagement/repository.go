@@ -15,6 +15,9 @@ func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
 func (r *Repository) Users(search, status, role string) ([]UserRow, error) {
 	q := `SELECT u.id,u.name,u.email,u.is_active,
 COALESCE(GROUP_CONCAT(DISTINCT ro.name ORDER BY ro.name SEPARATOR ', '),'Tanpa role') roles,
+CASE WHEN EXISTS(SELECT 1 FROM students sx WHERE sx.user_id=u.id) THEN 'student'
+     WHEN EXISTS(SELECT 1 FROM lecturers lx WHERE lx.user_id=u.id) THEN 'lecturer'
+     ELSE '' END academic_type,
 DATE_FORMAT(u.created_at,'%d/%m/%Y') created_at,
 COALESCE(DATE_FORMAT(u.last_login_at,'%d/%m/%Y %H:%i'),'Belum pernah') last_login_at
 FROM users u LEFT JOIN model_has_roles mr ON mr.user_id=u.id LEFT JOIN roles ro ON ro.id=mr.role_id WHERE 1=1`
@@ -87,6 +90,16 @@ func (r *Repository) Toggle(userID uint64) error {
 
 func (r *Repository) SetRoles(userID uint64, roleIDs []uint64) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
+		var academicType string
+		if err := tx.Raw(`SELECT CASE
+WHEN EXISTS(SELECT 1 FROM students WHERE user_id=?) THEN 'student'
+WHEN EXISTS(SELECT 1 FROM lecturers WHERE user_id=?) THEN 'lecturer'
+ELSE '' END`, userID, userID).Scan(&academicType).Error; err != nil {
+			return err
+		}
+		if academicType != "" {
+			return errors.New("role akun mahasiswa dan dosen ditentukan otomatis dari data akademik")
+		}
 		var count int64
 		if err := tx.Table("roles").Where("id IN ?", roleIDs).Count(&count).Error; err != nil {
 			return err

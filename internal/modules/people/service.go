@@ -10,33 +10,84 @@ import (
 type Service struct{ repo *Repository }
 
 func NewService(r *Repository) *Service { return &Service{repo: r} }
-func (s *Service) Students(q, status, source string) ([]StudentRow, []ProgramOption, error) {
+
+const peoplePerPage = 25
+
+func (s *Service) Students(q, status, source string, page int) ([]StudentRow, []ProgramOption, Pagination, PeopleStats, error) {
 	if !studentStatus(status) {
 		status = ""
 	}
 	if source != "manual" && source != "siakad" {
 		source = ""
 	}
-	rows, e := s.repo.Students(strings.TrimSpace(q), status, source)
+	rows, total, page, e := s.repo.Students(strings.TrimSpace(q), status, source, page, peoplePerPage)
 	if e != nil {
-		return nil, nil, e
+		return nil, nil, Pagination{}, PeopleStats{}, e
 	}
+	assignStudentRowNumbers(rows, page)
 	programs, e := s.repo.Programs()
-	return rows, programs, e
+	if e != nil {
+		return nil, nil, Pagination{}, PeopleStats{}, e
+	}
+	stats, e := s.repo.StudentStats()
+	return rows, programs, newPagination(page, total, peoplePerPage), stats, e
 }
-func (s *Service) Lecturers(q, status, source string) ([]LecturerRow, []ProgramOption, error) {
+func (s *Service) Lecturers(q, status, source string, page int) ([]LecturerRow, []ProgramOption, Pagination, PeopleStats, error) {
 	if !lecturerStatus(status) {
 		status = ""
 	}
 	if source != "manual" && source != "siakad" {
 		source = ""
 	}
-	rows, e := s.repo.Lecturers(strings.TrimSpace(q), status, source)
+	rows, total, page, e := s.repo.Lecturers(strings.TrimSpace(q), status, source, page, peoplePerPage)
 	if e != nil {
-		return nil, nil, e
+		return nil, nil, Pagination{}, PeopleStats{}, e
 	}
+	assignLecturerRowNumbers(rows, page)
 	programs, e := s.repo.Programs()
-	return rows, programs, e
+	if e != nil {
+		return nil, nil, Pagination{}, PeopleStats{}, e
+	}
+	stats, e := s.repo.LecturerStats()
+	return rows, programs, newPagination(page, total, peoplePerPage), stats, e
+}
+
+func newPagination(page, total, perPage int) Pagination {
+	totalPages := (total + perPage - 1) / perPage
+	if totalPages == 0 {
+		totalPages = 1
+	}
+	p := Pagination{Page: page, PerPage: perPage, Total: total, TotalPages: totalPages, HasPrev: page > 1, HasNext: page < totalPages, PrevPage: page - 1, NextPage: page + 1}
+	if total > 0 {
+		p.From = (page-1)*perPage + 1
+		p.To = p.From + perPage - 1
+		if p.To > total {
+			p.To = total
+		}
+	}
+	start, end := page-2, page+2
+	if start < 1 {
+		start = 1
+	}
+	if end > totalPages {
+		end = totalPages
+	}
+	for i := start; i <= end; i++ {
+		p.Pages = append(p.Pages, i)
+	}
+	return p
+}
+
+func assignStudentRowNumbers(rows []StudentRow, page int) {
+	for i := range rows {
+		rows[i].RowNumber = (page-1)*peoplePerPage + i + 1
+	}
+}
+
+func assignLecturerRowNumbers(rows []LecturerRow, page int) {
+	for i := range rows {
+		rows[i].RowNumber = (page-1)*peoplePerPage + i + 1
+	}
 }
 func (s *Service) CreateStudent(in StudentInput) error {
 	in.Name = strings.TrimSpace(in.Name)

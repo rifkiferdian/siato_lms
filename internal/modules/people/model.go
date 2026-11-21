@@ -1,6 +1,7 @@
 package people
 
 type StudentRow struct {
+	RowNumber                                                                                                  int `gorm:"-"`
 	ID, UserID                                                                                                 uint64
 	Name, Email, StudentNumber, ProgramCode, ProgramName, AcademicStatus, DataSource, ExternalID, LastSyncedAt string
 	EntryYear                                                                                                  uint16
@@ -8,6 +9,7 @@ type StudentRow struct {
 	ClassCount                                                                                                 int
 }
 type LecturerRow struct {
+	RowNumber                                                                                                   int `gorm:"-"`
 	ID, UserID                                                                                                  uint64
 	Name, Email, EmployeeNumber, ProgramCode, ProgramName, AcademicStatus, DataSource, ExternalID, LastSyncedAt string
 	IsActive                                                                                                    bool
