@@ -2,6 +2,7 @@ package classes
 
 import (
 	"errors"
+	"math"
 	"strings"
 )
 
@@ -94,15 +95,33 @@ func (s *Service) Lecturers(classID uint64) ([]LecturerOption, error) {
 	}
 	return s.repo.Lecturers(classID)
 }
-func (s *Service) SetLecturers(classID uint64, ids []uint64, coordinator uint64) error {
-	if classID == 0 || len(ids) == 0 {
+func (s *Service) SetLecturers(classID uint64, assignments []LecturerAssignment, coordinator uint64) error {
+	if classID == 0 || len(assignments) == 0 {
 		return errors.New("pilih minimal satu dosen pengampu")
 	}
 	seen := map[uint64]bool{}
 	found := false
-	for _, id := range ids {
+	validComponents := map[string]bool{"T": true, "P": true, "PR": true, "L": true}
+	required, err := s.repo.ComponentCredits(classID)
+	if err != nil {
+		return err
+	}
+	allocated := map[string]float64{}
+	for _, assignment := range assignments {
+		id := assignment.LecturerID
 		if id == 0 || seen[id] {
 			return errors.New("pilihan dosen tidak valid")
+		}
+		if len(assignment.Components) == 0 {
+			return errors.New("setiap dosen pengampu wajib memiliki minimal satu komponen mengajar")
+		}
+		componentSeen := map[string]bool{}
+		for _, component := range assignment.Components {
+			if !validComponents[component.Code] || componentSeen[component.Code] || component.Credits <= 0 || component.Credits > 12 {
+				return errors.New("komponen mengajar tidak valid")
+			}
+			componentSeen[component.Code] = true
+			allocated[component.Code] += component.Credits
 		}
 		seen[id] = true
 		if id == coordinator {
@@ -112,7 +131,17 @@ func (s *Service) SetLecturers(classID uint64, ids []uint64, coordinator uint64)
 	if !found {
 		return errors.New("koordinator harus dipilih dari dosen pengampu")
 	}
-	return s.repo.SetLecturers(classID, ids, coordinator)
+	for code, credits := range required {
+		if math.Abs(allocated[code]-credits) > 0.001 {
+			return errors.New("total alokasi SKS dosen untuk komponen " + code + " harus sama dengan SKS komponen mata kuliah")
+		}
+	}
+	for code, credits := range allocated {
+		if _, ok := required[code]; !ok && credits > 0 {
+			return errors.New("komponen " + code + " tidak tersedia pada mata kuliah")
+		}
+	}
+	return s.repo.SetLecturers(classID, assignments, coordinator)
 }
 func (s *Service) Delete(id uint64) error {
 	if id == 0 {

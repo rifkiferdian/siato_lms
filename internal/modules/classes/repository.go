@@ -134,12 +134,25 @@ func (r *Repository) Lecturers(classID uint64) ([]LecturerOption, error) {
 	var rows []LecturerOption
 	err := r.db.Raw(`SELECT l.id,u.name,l.employee_number,COALESCE(sp.name,'-') program_name,
 EXISTS(SELECT 1 FROM class_lecturers cl WHERE cl.class_id=? AND cl.lecturer_id=l.id) assigned,
-EXISTS(SELECT 1 FROM class_lecturers cl WHERE cl.class_id=? AND cl.lecturer_id=l.id AND cl.is_coordinator=1) is_coordinator
-FROM lecturers l JOIN users u ON u.id=l.user_id LEFT JOIN study_programs sp ON sp.id=l.study_program_id WHERE u.is_active=1 ORDER BY u.name`, classID, classID).Scan(&rows).Error
+EXISTS(SELECT 1 FROM class_lecturers cl WHERE cl.class_id=? AND cl.lecturer_id=l.id AND cl.is_coordinator=1) is_coordinator,
+EXISTS(SELECT 1 FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='T') theory,
+EXISTS(SELECT 1 FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='P') practicum,
+EXISTS(SELECT 1 FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='PR') practice,
+EXISTS(SELECT 1 FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='L') field
+,
+COALESCE((SELECT x.credits FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='T'),0) theory_credits,
+COALESCE((SELECT x.credits FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='P'),0) practicum_credits,
+COALESCE((SELECT x.credits FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='PR'),0) practice_credits,
+COALESCE((SELECT x.credits FROM class_lecturer_components x JOIN learning_components lc ON lc.id=x.component_id WHERE x.class_id=? AND x.lecturer_id=l.id AND lc.code='L'),0) field_credits
+FROM lecturers l JOIN users u ON u.id=l.user_id LEFT JOIN study_programs sp ON sp.id=l.study_program_id WHERE u.is_active=1 ORDER BY u.name`, classID, classID, classID, classID, classID, classID, classID, classID, classID, classID).Scan(&rows).Error
 	return rows, err
 }
-func (r *Repository) SetLecturers(classID uint64, lecturerIDs []uint64, coordinatorID uint64) error {
+func (r *Repository) SetLecturers(classID uint64, assignments []LecturerAssignment, coordinatorID uint64) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
+		lecturerIDs := make([]uint64, 0, len(assignments))
+		for _, assignment := range assignments {
+			lecturerIDs = append(lecturerIDs, assignment.LecturerID)
+		}
 		var valid int64
 		if err := tx.Table("lecturers l").Joins("JOIN users u ON u.id=l.user_id").Where("l.id IN ? AND u.is_active=1", lecturerIDs).Count(&valid).Error; err != nil {
 			return err
@@ -150,13 +163,39 @@ func (r *Repository) SetLecturers(classID uint64, lecturerIDs []uint64, coordina
 		if err := tx.Exec("DELETE FROM class_lecturers WHERE class_id=?", classID).Error; err != nil {
 			return err
 		}
-		for _, lecturerID := range lecturerIDs {
-			if err := tx.Exec("INSERT INTO class_lecturers(class_id,lecturer_id,is_coordinator) VALUES(?,?,?)", classID, lecturerID, lecturerID == coordinatorID).Error; err != nil {
+		for _, assignment := range assignments {
+			if err := tx.Exec("INSERT INTO class_lecturers(class_id,lecturer_id,is_coordinator) VALUES(?,?,?)", classID, assignment.LecturerID, assignment.LecturerID == coordinatorID).Error; err != nil {
 				return err
+			}
+			for _, component := range assignment.Components {
+				result := tx.Exec(`INSERT INTO class_lecturer_components(class_id,lecturer_id,component_id,credits)
+SELECT ?,?,lc.id,? FROM learning_components lc
+WHERE lc.code=? AND EXISTS(
+ SELECT 1 FROM course_classes cc JOIN course_credit_components ccc ON ccc.course_id=cc.course_id AND ccc.component_id=lc.id
+ WHERE cc.id=? AND ccc.credits>0)`, classID, assignment.LecturerID, component.Credits, component.Code, classID)
+				if result.Error != nil {
+					return result.Error
+				}
+				if result.RowsAffected == 0 {
+					return errors.New("komponen mengajar tidak tersedia pada mata kuliah kelas ini")
+				}
 			}
 		}
 		return nil
 	})
+}
+func (r *Repository) ComponentCredits(classID uint64) (map[string]float64, error) {
+	type row struct {
+		Code    string
+		Credits float64
+	}
+	var rows []row
+	err := r.db.Raw(`SELECT lc.code,ccc.credits FROM course_classes cc JOIN course_credit_components ccc ON ccc.course_id=cc.course_id JOIN learning_components lc ON lc.id=ccc.component_id WHERE cc.id=? AND ccc.credits>0`, classID).Scan(&rows).Error
+	out := map[string]float64{}
+	for _, v := range rows {
+		out[v.Code] = v.Credits
+	}
+	return out, err
 }
 func (r *Repository) Delete(id uint64) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {

@@ -30,7 +30,19 @@ type StudentRow struct {
 }
 
 type LecturerOption struct {
-	ID                                uint64
-	Name, EmployeeNumber, ProgramName string
-	Assigned, IsCoordinator           bool
+	ID                                                             uint64
+	Name, EmployeeNumber, ProgramName                              string
+	Assigned, IsCoordinator                                        bool
+	Theory, Practicum, Practice, Field                             bool
+	TheoryCredits, PracticumCredits, PracticeCredits, FieldCredits float64
+}
+
+type LecturerAssignment struct {
+	LecturerID uint64
+	Components []ComponentAllocation
+}
+
+type ComponentAllocation struct {
+	Code    string
+	Credits float64
 }

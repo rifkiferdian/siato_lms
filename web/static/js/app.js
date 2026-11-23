@@ -41,6 +41,20 @@ document.addEventListener('submit', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  const lecturerForm = document.querySelector('form[action$="/lecturers"]');
+  if (lecturerForm) {
+    const classID = lecturerForm.action.split('/').slice(-2,-1)[0];
+    fetch('/admin/classes/' + classID + '/lecturers-data', {headers:{Accept:'application/json'}}).then(function(response){return response.ok?response.json():[]}).then(function(lecturers){
+      lecturers.forEach(function(lecturer){
+        const mainCheckbox=lecturerForm.querySelector('input[name="lecturer_ids"][value="'+lecturer.ID+'"]');if(!mainCheckbox)return;
+        const card=mainCheckbox.closest('.rounded-xl');const coordinator=card.querySelector('input[name="coordinator_id"]');
+        const components=document.createElement('div');components.className='mt-3 border-t border-slate-100 pt-3';components.innerHTML='<p class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Komponen mengajar</p><div class="grid grid-cols-4 gap-1.5"></div>';
+        const grid=components.querySelector('div');[['T','Teori',lecturer.Theory,lecturer.TheoryCredits],['P','Praktikum',lecturer.Practicum,lecturer.PracticumCredits],['PR','Praktik',lecturer.Practice,lecturer.PracticeCredits],['L','Lapangan',lecturer.Field,lecturer.FieldCredits]].forEach(function(item){const label=document.createElement('label');label.className='flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-slate-200 p-2 text-[10px] font-semibold text-slate-500 hover:border-blue-200';label.title=item[1];label.innerHTML='<span class="flex items-center gap-1.5"><input type="checkbox" name="components_'+lecturer.ID+'" value="'+item[0]+'" class="accent-blue-600" '+(item[2]?'checked':'')+'><strong>'+item[0]+'</strong></span><input type="number" name="credits_'+lecturer.ID+'_'+item[0]+'" min="0" max="12" step="0.25" value="'+(item[3]||0)+'" class="w-full rounded-md border border-slate-200 px-1 py-1 text-center text-xs" aria-label="SKS '+item[1]+'">';const input=label.querySelector('input[type="checkbox"]');const credits=label.querySelector('input[type="number"]');input.addEventListener('change',function(){if(input.checked){mainCheckbox.checked=true;if(Number(credits.value)===0)credits.value='1'}});credits.addEventListener('input',function(){if(Number(credits.value)>0){input.checked=true;mainCheckbox.checked=true}});grid.appendChild(label)});
+        coordinator.closest('label').parentNode.insertBefore(components,coordinator.closest('label'));
+      });
+    });
+  }
+
   document.querySelectorAll('input[name="coordinator_id"]').forEach(function (radio) {
     radio.addEventListener('change', function () {
       const card = radio.closest('.rounded-xl');

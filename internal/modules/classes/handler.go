@@ -91,6 +91,15 @@ func (h *Handler) EditData(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, d)
 }
+func (h *Handler) LecturerData(c *gin.Context) {
+	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	rows, e := h.service.Lecturers(classID)
+	if e != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	c.JSON(http.StatusOK, rows)
+}
 func (h *Handler) Create(c *gin.Context) {
 	h.save(c, 0)
 }
@@ -120,16 +129,22 @@ func (h *Handler) SetLecturers(c *gin.Context) {
 	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	coordinator, _ := strconv.ParseUint(c.PostForm("coordinator_id"), 10, 64)
 	values := c.PostFormArray("lecturer_ids")
-	ids := make([]uint64, 0, len(values))
+	assignments := make([]LecturerAssignment, 0, len(values))
 	for _, v := range values {
 		id, e := strconv.ParseUint(v, 10, 64)
 		if e != nil {
 			h.redirectDetail(c, classID, "error", "Pilihan dosen tidak valid")
 			return
 		}
-		ids = append(ids, id)
+		codes := c.PostFormArray("components_" + strconv.FormatUint(id, 10))
+		components := make([]ComponentAllocation, 0, len(codes))
+		for _, code := range codes {
+			credits, _ := strconv.ParseFloat(c.PostForm("credits_"+strconv.FormatUint(id, 10)+"_"+code), 64)
+			components = append(components, ComponentAllocation{Code: code, Credits: credits})
+		}
+		assignments = append(assignments, LecturerAssignment{LecturerID: id, Components: components})
 	}
-	if e := h.service.SetLecturers(classID, ids, coordinator); e != nil {
+	if e := h.service.SetLecturers(classID, assignments, coordinator); e != nil {
 		h.redirectDetail(c, classID, "error", e.Error())
 		return
 	}
