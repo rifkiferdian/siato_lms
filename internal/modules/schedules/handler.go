@@ -40,15 +40,31 @@ func (h *Handler) page(c *gin.Context, portal, title string) {
 func (h *Handler) Admin(c *gin.Context)    { h.page(c, "admin", "Kelola Jadwal Kuliah") }
 func (h *Handler) Lecturer(c *gin.Context) { h.page(c, "lecturer", "Jadwal Mengajar") }
 func (h *Handler) Student(c *gin.Context)  { h.page(c, "student", "Jadwal Kuliah") }
+func (h *Handler) EditData(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	row, e := h.service.Get(id)
+	if e != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	c.JSON(http.StatusOK, row)
+}
 func (h *Handler) Create(c *gin.Context) {
+	h.save(c, 0)
+}
+func (h *Handler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.save(c, id)
+}
+func (h *Handler) save(c *gin.Context, id uint64) {
 	classID, _ := strconv.ParseUint(c.PostForm("class_id"), 10, 64)
 	day, _ := strconv.Atoi(c.PostForm("day_of_week"))
 	in := CreateInput{ClassID: classID, DayOfWeek: day, StartTime: c.PostForm("start_time"), EndTime: c.PostForm("end_time"), Room: c.PostForm("room"), DeliveryMode: c.PostForm("delivery_mode"), MeetingURL: c.PostForm("meeting_url"), EffectiveFrom: c.PostForm("effective_from"), EffectiveUntil: c.PostForm("effective_until")}
-	if err := h.service.Create(in); err != nil {
+	if err := h.service.Save(id, in); err != nil {
 		c.Redirect(http.StatusSeeOther, "/admin/schedules?error="+urlQuery(err.Error()))
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/admin/schedules?success=Jadwal berhasil ditambahkan")
+	c.Redirect(http.StatusSeeOther, "/admin/schedules?success=Jadwal berhasil disimpan")
 }
 func (h *Handler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)

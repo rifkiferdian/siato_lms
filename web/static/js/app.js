@@ -41,6 +41,45 @@ document.addEventListener('submit', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('input[name="coordinator_id"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      const card = radio.closest('.rounded-xl');
+      const checkbox = card && card.querySelector('input[name="lecturer_ids"]');
+      if (checkbox) checkbox.checked = true;
+    });
+  });
+
+  const classShell = document.querySelector('[x-data="classPage"]');
+  if (classShell) {
+    const createButton = Array.from(classShell.querySelectorAll('button')).find(function (button) { return button.textContent.includes('Buat Kelas'); });
+    const modal = classShell.querySelector('[x-show="classModal"]');
+    const form = modal && modal.querySelector('form');
+    const title = modal && modal.querySelector('h2');
+    if (createButton && form) {
+      createButton.addEventListener('click', function () { form.reset(); form.action='/admin/classes'; if(title) title.textContent='Buat Kelas Perkuliahan'; });
+      classShell.querySelectorAll('.class-card').forEach(function (card) {
+        const link = card.querySelector('a[href^="/admin/classes/"]');
+        const deleteForm = card.querySelector('form[action$="/delete"]');
+        if (!link || !deleteForm) return;
+        const classID = link.getAttribute('href').split('/').pop();
+        const button = document.createElement('button');
+        button.type='button';button.className='grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100';button.title='Edit kelas';button.innerHTML='<i class="fa-solid fa-pen"></i>';
+        deleteForm.parentNode.insertBefore(button,deleteForm);
+        button.addEventListener('click',async function(){
+          const response=await fetch('/admin/classes/'+classID+'/edit-data',{headers:{Accept:'application/json'}});if(!response.ok)return;const data=await response.json();createButton.click();form.action='/admin/classes/'+classID;
+          const values={course_id:data.CourseID,semester_id:data.SemesterID,name:data.ClassName,status:data.Status,capacity:data.Capacity,max_meetings:data.MaxMeetings,description:data.Description};Object.keys(values).forEach(function(name){if(form.elements[name])form.elements[name].value=values[name]});if(title)title.textContent='Edit Kelas Perkuliahan';
+        });
+      });
+    }
+  }
+
+  const scheduleShell = document.querySelector('[x-data="schedulePage"]');
+  if (scheduleShell) {
+    const createButton = Array.from(scheduleShell.querySelectorAll('button')).find(function (button) { return button.textContent.includes('Tambah Jadwal'); });
+    const modal = scheduleShell.querySelector('[x-show="scheduleModal"]');const form=modal&&modal.querySelector('form');const title=modal&&modal.querySelector('h2');
+    if(createButton&&form){createButton.addEventListener('click',function(){form.reset();form.action='/admin/schedules';if(title)title.textContent='Tambah Jadwal Kuliah'});scheduleShell.querySelectorAll('.schedule-row').forEach(function(row){const deleteForm=row.querySelector('form[action$="/delete"]');if(!deleteForm)return;const id=deleteForm.action.split('/').slice(-2,-1)[0];const button=document.createElement('button');button.type='button';button.className='grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100';button.title='Edit jadwal';button.innerHTML='<i class="fa-solid fa-pen"></i>';deleteForm.parentNode.insertBefore(button,deleteForm);button.addEventListener('click',async function(){const response=await fetch('/admin/schedules/'+id+'/edit-data',{headers:{Accept:'application/json'}});if(!response.ok)return;const data=await response.json();createButton.click();form.action='/admin/schedules/'+id;const values={class_id:data.ClassID,day_of_week:data.DayOfWeek,start_time:data.StartTime,end_time:data.EndTime,room:data.Room,delivery_mode:data.DeliveryMode,meeting_url:data.MeetingURL,effective_from:data.EffectiveFrom,effective_until:data.EffectiveUntil};Object.keys(values).forEach(function(name){if(form.elements[name])form.elements[name].value=values[name]||''});if(title)title.textContent='Edit Jadwal Kuliah'})})}
+  }
+
   if (window.location.pathname === '/admin/courses') {
     const courseTable = document.querySelector('.people-table');
     if (courseTable) {

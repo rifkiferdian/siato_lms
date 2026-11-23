@@ -24,7 +24,7 @@ type Row struct {
 	ClassID                                                                          uint64
 	CourseCode, CourseName, ClassName, LecturerNames, Room, DeliveryMode, MeetingURL string
 	DayOfWeek                                                                        uint8
-	DayName, StartTime, EndTime                                                      string
+	DayName, StartTime, EndTime, EffectiveFrom, EffectiveUntil                       string
 	Credits                                                                          uint8
 }
 

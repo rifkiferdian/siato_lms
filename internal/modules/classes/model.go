@@ -2,6 +2,7 @@ package classes
 
 type ClassRow struct {
 	ID                                                                                                                 uint64
+	CourseID, SemesterID                                                                                               uint64
 	CourseCode, CourseName, ClassName, Description, Status, SemesterName, AcademicYear, LecturerNames, ScheduleSummary string
 	Credits, MaxMeetings                                                                                               uint8
 	Capacity, StudentCount, LecturerCount, ScheduleCount                                                               int
@@ -26,4 +27,10 @@ type StudentOption struct {
 type StudentRow struct {
 	ID                                      uint64
 	Name, Email, StudentNumber, ProgramName string
+}
+
+type LecturerOption struct {
+	ID                                uint64
+	Name, EmployeeNumber, ProgramName string
+	Assigned, IsCoordinator           bool
 }

@@ -21,5 +21,6 @@ type DetailData struct {
 	Students              []StudentRow
 	AvailableStudents     []StudentOption
 	EntryYears            []uint16
+	Lecturers             []LecturerOption
 	Success, Error        string
 }

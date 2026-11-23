@@ -54,6 +54,9 @@ func (h *Handler) detail(c *gin.Context, portal, title string) {
 		tab = "overview"
 	}
 	data := DetailData{Portal: portal, Tab: tab, Class: d, CanManage: portal == "admin", Success: c.Query("success"), Error: c.Query("error")}
+	if portal == "admin" {
+		data.Lecturers, _ = h.service.Lecturers(classID)
+	}
 	data.CanManageParticipants = portal == "admin" && canManageClassStudents(roles)
 	if data.CanManageParticipants && data.Tab == "participants" {
 		data.Students, data.AvailableStudents, err = h.service.Students(classID)
@@ -78,17 +81,59 @@ func (h *Handler) Student(c *gin.Context)        { h.page(c, "student", "Kelas S
 func (h *Handler) AdminDetail(c *gin.Context)    { h.detail(c, "admin", "Detail Kelas") }
 func (h *Handler) LecturerDetail(c *gin.Context) { h.detail(c, "lecturer", "Detail Kelas") }
 func (h *Handler) StudentDetail(c *gin.Context)  { h.detail(c, "student", "Detail Kelas") }
+func (h *Handler) EditData(c *gin.Context) {
+	uid, _, _ := h.identity(c)
+	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	d, e := h.service.Detail(classID, uid, "admin")
+	if e != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	c.JSON(http.StatusOK, d)
+}
 func (h *Handler) Create(c *gin.Context) {
+	h.save(c, 0)
+}
+func (h *Handler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.save(c, id)
+}
+func (h *Handler) save(c *gin.Context, id uint64) {
 	course, _ := strconv.ParseUint(c.PostForm("course_id"), 10, 64)
 	semester, _ := strconv.ParseUint(c.PostForm("semester_id"), 10, 64)
 	capacity, _ := strconv.Atoi(c.PostForm("capacity"))
 	meetings, _ := strconv.Atoi(c.PostForm("max_meetings"))
 	in := CreateInput{CourseID: course, SemesterID: semester, Name: c.PostForm("name"), Description: c.PostForm("description"), Capacity: capacity, MaxMeetings: meetings, Status: c.PostForm("status")}
-	if err := h.service.Create(in); err != nil {
+	var err error
+	if id == 0 {
+		err = h.service.Create(in)
+	} else {
+		err = h.service.Update(id, in)
+	}
+	if err != nil {
 		c.Redirect(http.StatusSeeOther, "/admin/classes?error="+url.QueryEscape(err.Error()))
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/admin/classes?success="+url.QueryEscape("Kelas berhasil dibuat"))
+	c.Redirect(http.StatusSeeOther, "/admin/classes?success="+url.QueryEscape("Kelas berhasil disimpan"))
+}
+func (h *Handler) SetLecturers(c *gin.Context) {
+	classID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	coordinator, _ := strconv.ParseUint(c.PostForm("coordinator_id"), 10, 64)
+	values := c.PostFormArray("lecturer_ids")
+	ids := make([]uint64, 0, len(values))
+	for _, v := range values {
+		id, e := strconv.ParseUint(v, 10, 64)
+		if e != nil {
+			h.redirectDetail(c, classID, "error", "Pilihan dosen tidak valid")
+			return
+		}
+		ids = append(ids, id)
+	}
+	if e := h.service.SetLecturers(classID, ids, coordinator); e != nil {
+		h.redirectDetail(c, classID, "error", e.Error())
+		return
+	}
+	c.Redirect(http.StatusSeeOther, "/admin/classes/"+strconv.FormatUint(classID, 10)+"?tab=overview&success="+url.QueryEscape("Dosen pengampu berhasil diperbarui"))
 }
 func (h *Handler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)

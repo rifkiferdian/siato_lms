@@ -57,6 +57,12 @@ func (s *Service) RemoveStudent(classID, studentID uint64) error {
 	return s.repo.RemoveStudent(classID, studentID)
 }
 func (s *Service) Create(in CreateInput) error {
+	if err := validateClass(&in); err != nil {
+		return err
+	}
+	return s.repo.Create(in)
+}
+func validateClass(in *CreateInput) error {
 	in.Name = strings.TrimSpace(in.Name)
 	in.Description = strings.TrimSpace(in.Description)
 	if in.CourseID == 0 || in.SemesterID == 0 || in.Name == "" {
@@ -71,7 +77,42 @@ func (s *Service) Create(in CreateInput) error {
 	if !validStatus(in.Status) {
 		return errors.New("status kelas tidak valid")
 	}
-	return s.repo.Create(in)
+	return nil
+}
+func (s *Service) Update(id uint64, in CreateInput) error {
+	if id == 0 {
+		return errors.New("kelas tidak valid")
+	}
+	if err := validateClass(&in); err != nil {
+		return err
+	}
+	return s.repo.Update(id, in)
+}
+func (s *Service) Lecturers(classID uint64) ([]LecturerOption, error) {
+	if classID == 0 {
+		return nil, gormErrNotFound
+	}
+	return s.repo.Lecturers(classID)
+}
+func (s *Service) SetLecturers(classID uint64, ids []uint64, coordinator uint64) error {
+	if classID == 0 || len(ids) == 0 {
+		return errors.New("pilih minimal satu dosen pengampu")
+	}
+	seen := map[uint64]bool{}
+	found := false
+	for _, id := range ids {
+		if id == 0 || seen[id] {
+			return errors.New("pilihan dosen tidak valid")
+		}
+		seen[id] = true
+		if id == coordinator {
+			found = true
+		}
+	}
+	if !found {
+		return errors.New("koordinator harus dipilih dari dosen pengampu")
+	}
+	return s.repo.SetLecturers(classID, ids, coordinator)
 }
 func (s *Service) Delete(id uint64) error {
 	if id == 0 {

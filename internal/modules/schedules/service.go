@@ -20,7 +20,16 @@ func (s *Service) Page(portal string, userID uint64, day int) ([]Row, []ClassOpt
 	classes, e := s.repo.Classes()
 	return rows, classes, e
 }
+func (s *Service) Get(id uint64) (Row, error) {
+	if id == 0 {
+		return Row{}, errors.New("jadwal tidak valid")
+	}
+	return s.repo.Get(id)
+}
 func (s *Service) Create(in CreateInput) error {
+	return s.Save(0, in)
+}
+func (s *Service) Save(id uint64, in CreateInput) error {
 	in.Room = strings.TrimSpace(in.Room)
 	in.DeliveryMode = strings.ToLower(in.DeliveryMode)
 	if in.ClassID == 0 || in.DayOfWeek < 1 || in.DayOfWeek > 7 || in.Room == "" {
@@ -40,14 +49,17 @@ func (s *Service) Create(in CreateInput) error {
 			return errors.New("tautan pertemuan tidak valid")
 		}
 	}
-	conflict, e := s.repo.HasConflict(in)
+	conflict, e := s.repo.HasConflict(id, in)
 	if e != nil {
 		return e
 	}
 	if conflict {
 		return ErrConflict
 	}
-	return s.repo.Create(in)
+	if id == 0 {
+		return s.repo.Create(in)
+	}
+	return s.repo.Update(id, in)
 }
 func (s *Service) Delete(id uint64) error {
 	if id == 0 {

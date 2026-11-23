@@ -1,12 +1,15 @@
 package classes
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"gorm.io/gorm"
+)
 
 type Repository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) *Repository { return &Repository{db: db} }
 
-const classSelect = `SELECT cc.id,c.code course_code,c.name course_name,cc.name class_name,COALESCE(cc.description,'') description,cc.status,c.credits,cc.capacity,cc.max_meetings,
+const classSelect = `SELECT cc.id,cc.course_id,cc.semester_id,c.code course_code,c.name course_name,cc.name class_name,COALESCE(cc.description,'') description,cc.status,c.credits,cc.capacity,cc.max_meetings,
 CONCAT(s.name,' ',ay.name) semester_name,ay.name academic_year,
 COALESCE((SELECT GROUP_CONCAT(DISTINCT u.name ORDER BY cl.is_coordinator DESC,u.name SEPARATOR ', ') FROM class_lecturers cl JOIN lecturers l ON l.id=cl.lecturer_id JOIN users u ON u.id=l.user_id WHERE cl.class_id=cc.id),'Belum ada dosen') lecturer_names,
 (SELECT COUNT(*) FROM class_students cs WHERE cs.class_id=cc.id) student_count,
@@ -123,6 +126,37 @@ func (r *Repository) Options() ([]Option, []Option, error) {
 }
 func (r *Repository) Create(in CreateInput) error {
 	return r.db.Exec("INSERT INTO course_classes(course_id,semester_id,name,description,capacity,max_meetings,status) VALUES(?,?,?,?,?,?,?)", in.CourseID, in.SemesterID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status).Error
+}
+func (r *Repository) Update(id uint64, in CreateInput) error {
+	return r.db.Exec("UPDATE course_classes SET course_id=?,semester_id=?,name=?,description=?,capacity=?,max_meetings=?,status=? WHERE id=?", in.CourseID, in.SemesterID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status, id).Error
+}
+func (r *Repository) Lecturers(classID uint64) ([]LecturerOption, error) {
+	var rows []LecturerOption
+	err := r.db.Raw(`SELECT l.id,u.name,l.employee_number,COALESCE(sp.name,'-') program_name,
+EXISTS(SELECT 1 FROM class_lecturers cl WHERE cl.class_id=? AND cl.lecturer_id=l.id) assigned,
+EXISTS(SELECT 1 FROM class_lecturers cl WHERE cl.class_id=? AND cl.lecturer_id=l.id AND cl.is_coordinator=1) is_coordinator
+FROM lecturers l JOIN users u ON u.id=l.user_id LEFT JOIN study_programs sp ON sp.id=l.study_program_id WHERE u.is_active=1 ORDER BY u.name`, classID, classID).Scan(&rows).Error
+	return rows, err
+}
+func (r *Repository) SetLecturers(classID uint64, lecturerIDs []uint64, coordinatorID uint64) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var valid int64
+		if err := tx.Table("lecturers l").Joins("JOIN users u ON u.id=l.user_id").Where("l.id IN ? AND u.is_active=1", lecturerIDs).Count(&valid).Error; err != nil {
+			return err
+		}
+		if int(valid) != len(lecturerIDs) {
+			return errors.New("dosen tidak valid atau akun tidak aktif")
+		}
+		if err := tx.Exec("DELETE FROM class_lecturers WHERE class_id=?", classID).Error; err != nil {
+			return err
+		}
+		for _, lecturerID := range lecturerIDs {
+			if err := tx.Exec("INSERT INTO class_lecturers(class_id,lecturer_id,is_coordinator) VALUES(?,?,?)", classID, lecturerID, lecturerID == coordinatorID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 func (r *Repository) Delete(id uint64) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
