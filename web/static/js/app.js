@@ -41,6 +41,91 @@ document.addEventListener('submit', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  if (window.location.pathname === '/admin/courses') {
+    const courseTable = document.querySelector('.people-table');
+    if (courseTable) {
+      const page = Math.max(1, Number(new URLSearchParams(window.location.search).get('page')) || 1);
+      const heading = document.createElement('th');
+      heading.textContent = 'No.';
+      heading.className = 'w-16 text-center';
+      courseTable.querySelector('thead tr').prepend(heading);
+      courseTable.querySelectorAll('tbody tr').forEach(function (row, index) {
+        const cell = document.createElement('td');
+        cell.textContent = String((page - 1) * 20 + index + 1);
+        cell.className = 'text-center font-semibold text-slate-400';
+        row.prepend(cell);
+      });
+    }
+
+    const courseModalForm = document.querySelector('#course-modal form');
+    if (courseModalForm && !courseModalForm.querySelector('[name="theory_credits"]')) {
+      const typeRow = courseModalForm.querySelector('[name="course_type"]').closest('.grid');
+      const componentFields = document.createElement('div');
+      componentFields.className = 'course-component-fields';
+      componentFields.innerHTML = '<div class="mb-3 flex items-center justify-between"><div><p class="text-xs font-semibold text-slate-700">Komponen SKS</p><p class="mt-1 text-[11px] text-slate-400">Jumlah komponen harus sama dengan total SKS.</p></div><span class="rounded-lg bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-600">T + P + PR + L</span></div><div class="grid grid-cols-2 gap-3 sm:grid-cols-4"><label><span class="form-label">Teori (T)</span><input required type="number" name="theory_credits" min="0" max="12" value="0" class="form-input"></label><label><span class="form-label">Praktikum (P)</span><input required type="number" name="practicum_credits" min="0" max="12" value="0" class="form-input"></label><label><span class="form-label">Praktik (PR)</span><input required type="number" name="practice_credits" min="0" max="12" value="0" class="form-input"></label><label><span class="form-label">Lapangan (L)</span><input required type="number" name="field_credits" min="0" max="12" value="0" class="form-input"></label></div><p data-component-total class="mt-2 text-right text-[11px] font-semibold text-slate-500">Total komponen: 0 SKS</p>';
+      typeRow.parentNode.insertBefore(componentFields, typeRow);
+
+      function updateComponentTotal() {
+        const total = ['theory_credits','practicum_credits','practice_credits','field_credits'].reduce(function (sum, name) { return sum + (Number(courseModalForm.elements[name].value) || 0); }, 0);
+        const expected = Number(courseModalForm.elements.credits.value) || 0;
+        const output = componentFields.querySelector('[data-component-total]');
+        output.textContent = 'Total komponen: ' + total + ' SKS';
+        output.className = 'mt-2 text-right text-[11px] font-semibold ' + (total === expected ? 'text-emerald-600' : 'text-amber-600');
+      }
+      courseModalForm.addEventListener('input', updateComponentTotal);
+      courseModalForm.addEventListener('change', updateComponentTotal);
+    }
+
+    document.querySelectorAll('[data-academic-edit][data-modal="course-modal"]').forEach(function (button) {
+      if (button.dataset.action === '/admin/courses') {
+        Object.assign(button.dataset, {credits:'3',recommendedSemester:'1',courseType:'required',isActive:'1',theoryCredits:'3',practicumCredits:'0',practiceCredits:'0',fieldCredits:'0'});
+        return;
+      }
+      const match = button.dataset.action.match(/\/admin\/courses\/(\d+)$/);
+      const stored = match && document.querySelector('[data-course-component-store] [data-course-id="' + match[1] + '"]');
+      if (stored) Object.assign(button.dataset, {theoryCredits:stored.dataset.theoryCredits,practicumCredits:stored.dataset.practicumCredits,practiceCredits:stored.dataset.practiceCredits,fieldCredits:stored.dataset.fieldCredits});
+    });
+  }
+
+  const academicModals = document.querySelectorAll('[data-academic-modal]');
+
+  function closeAcademicModal(modal) {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  document.querySelectorAll('[data-academic-edit]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const modal = document.getElementById(button.dataset.modal);
+      if (!modal) return;
+      const form = modal.querySelector('form');
+      form.reset();
+      form.action = button.dataset.action;
+      form.querySelectorAll('[name]').forEach(function (field) {
+        if (field.name === '_csrf') return;
+        const key = field.name.replace(/_([a-z])/g, function (_, letter) { return letter.toUpperCase(); });
+        if (Object.prototype.hasOwnProperty.call(button.dataset, key)) field.value = button.dataset[key];
+      });
+      form.dispatchEvent(new Event('input', {bubbles: true}));
+      modal.hidden = false;
+      document.body.classList.add('overflow-hidden');
+      const firstField = form.querySelector('input:not([type="hidden"]), select');
+      if (firstField) firstField.focus();
+    });
+  });
+
+  academicModals.forEach(function (modal) {
+    modal.querySelectorAll('[data-modal-close]').forEach(function (button) {
+      button.addEventListener('click', function () { closeAcademicModal(modal); });
+    });
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+    academicModals.forEach(function (modal) { if (!modal.hidden) closeAcademicModal(modal); });
+  });
+
   document.querySelectorAll('[data-participant-picker]').forEach(function (form) {
     const year = form.querySelector('[data-participant-year]');
     const search = form.querySelector('[data-participant-search]');

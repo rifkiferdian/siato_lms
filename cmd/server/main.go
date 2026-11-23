@@ -10,8 +10,10 @@ import (
 	"siato_lms/internal/config"
 	"siato_lms/internal/database"
 	"siato_lms/internal/middleware"
+	"siato_lms/internal/modules/academics"
 	"siato_lms/internal/modules/auth"
 	"siato_lms/internal/modules/classes"
+	"siato_lms/internal/modules/coursecatalog"
 	"siato_lms/internal/modules/dashboard"
 	"siato_lms/internal/modules/people"
 	"siato_lms/internal/modules/rbac"
@@ -44,7 +46,7 @@ func main() {
 	r.Static("/static", "./web/static")
 	sm := middleware.NewSessionManager(cfg.SessionSecret, cfg.CookieSecure, cfg.SessionMaxAge)
 	r.Use(middleware.CSRF(sm))
-	views := view.New(sm, "./web/templates", cfg.AppName)
+	views := view.New(sm, "./web/templates", cfg.AppName, db)
 	rbacService := rbac.NewService(db)
 	authHandler := auth.NewHandler(auth.NewService(auth.NewRepository(db)), rbacService, sm, views)
 	auth.RegisterRoutes(r, authHandler, sm)
@@ -57,6 +59,10 @@ func main() {
 	people.RegisterRoutes(r, peopleHandler, sm, rbacService)
 	userManagementHandler := usermanagement.NewHandler(usermanagement.NewService(usermanagement.NewRepository(db)), rbacService, sm, views, db)
 	usermanagement.RegisterRoutes(r, userManagementHandler, sm, rbacService)
+	academicHandler := academics.NewHandler(academics.NewService(academics.NewRepository(db)), rbacService, sm, views, db)
+	academics.RegisterRoutes(r, academicHandler, sm, rbacService)
+	courseCatalogHandler := coursecatalog.NewHandler(coursecatalog.NewService(coursecatalog.NewRepository(db)), rbacService, sm, views, db)
+	coursecatalog.RegisterRoutes(r, courseCatalogHandler, sm, rbacService)
 	r.GET("/", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/dashboard") })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
 	server := &http.Server{Addr: cfg.Address, Handler: r, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}

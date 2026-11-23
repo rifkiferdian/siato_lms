@@ -27,5 +27,5 @@ Set `COOKIE_SECURE=true` di balik HTTPS. Private storage tidak dipasang sebagai 
 
 ## Status roadmap
 
-- Selesai: fondasi Phase 1, login/logout, session, CSRF, RBAC dasar, migration/seed, dashboard, jadwal, kelas, serta master mahasiswa dan dosen.
-- Belum: CRUD master akademik (Phase 2), detail kelas/pertemuan, QR, materi/tugas, messaging, notification, laporan. Menu untuk fitur tersebut belum berupa route aktif sampai implementasinya tersedia.
+- Selesai: fondasi Phase 1, login/logout, session, CSRF, RBAC dasar, migration/seed, dashboard, jadwal, kelas, master mahasiswa dan dosen, serta CRUD master akademik (tahun akademik, semester, program studi, dan mata kuliah).
+- Belum: pertemuan, QR, materi/tugas, messaging, notification, dan laporan. Menu untuk fitur tersebut belum berupa route aktif sampai implementasinya tersedia.

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"siato_lms/internal/middleware"
 )
 
@@ -14,21 +15,29 @@ type Renderer struct {
 	sm      *middleware.SessionManager
 	root    string
 	appName string
+	db      *gorm.DB
 }
 type Data struct {
 	Title, AppName, CSRF, Error, Success, CurrentPath string
 	User                                              any
 	Roles                                             []string
 	Content                                           any
+	ActiveSemester                                    string
 }
 
-func New(sm *middleware.SessionManager, root, appName string) *Renderer {
-	return &Renderer{sm: sm, root: root, appName: appName}
+func New(sm *middleware.SessionManager, root, appName string, db *gorm.DB) *Renderer {
+	return &Renderer{sm: sm, root: root, appName: appName, db: db}
 }
 func (r *Renderer) HTML(c *gin.Context, status int, page string, d Data) {
 	d.AppName = r.appName
 	d.CurrentPath = c.Request.URL.Path
 	d.CSRF, _ = r.sm.CSRF(c)
+	if len(d.Roles) > 0 && r.db != nil {
+		_ = r.db.Raw("SELECT CONCAT(s.name, ' ', y.name) FROM semesters s JOIN academic_years y ON y.id=s.academic_year_id WHERE s.is_active=1 LIMIT 1").Scan(&d.ActiveSemester).Error
+		if d.ActiveSemester == "" {
+			d.ActiveSemester = "Belum ditetapkan"
+		}
+	}
 	files := []string{filepath.Join(r.root, "layouts", "base.html"), filepath.Join(r.root, "components", "sidebar.html"), filepath.Join(r.root, filepath.FromSlash(page))}
 	t, err := template.New("base.html").Funcs(template.FuncMap{"hasRole": func(roles []string, target string) bool {
 		for _, role := range roles {
