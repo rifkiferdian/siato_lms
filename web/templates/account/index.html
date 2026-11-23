@@ -1,0 +1,63 @@
+{{define "content"}}
+<div class="mx-auto max-w-6xl">
+  <section class="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-6 text-white shadow-xl shadow-blue-200/50 sm:p-8">
+    <div class="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-cyan-400/10 blur-2xl"></div>
+    <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-4">
+        <span class="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white/15 text-2xl ring-1 ring-white/20 backdrop-blur"><i class="fa-solid fa-user-shield"></i></span>
+        <div><p class="text-[10px] font-bold tracking-[.18em] text-blue-200">PUSAT AKUN</p><h1 class="mt-1 text-2xl font-bold sm:text-3xl">Profil & Keamanan</h1><p class="mt-2 text-sm text-blue-100/80">Kelola identitas, kata sandi, dan perangkat yang terhubung.</p></div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur"><p class="text-xs text-blue-200">Akun aktif</p><strong class="mt-1 block max-w-64 truncate text-sm">{{.User.Email}}</strong></div>
+    </div>
+  </section>
+
+  {{if .Content.Success}}<div class="mb-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700"><i class="fa-solid fa-circle-check"></i>{{.Content.Success}}</div>{{end}}
+  {{if .Content.Error}}<div class="mb-5 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><i class="fa-solid fa-circle-exclamation"></i>{{.Content.Error}}</div>{{end}}
+
+  <div class="grid items-start gap-6 lg:grid-cols-[minmax(280px,.72fr)_minmax(0,1.28fr)]">
+    <aside class="space-y-6">
+      <section class="dashboard-card">
+        <div class="border-b border-slate-100 bg-gradient-to-r from-blue-50/70 to-white p-5">
+          <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-200"><i class="fa-solid fa-user"></i></span><div><h2 class="font-bold text-slate-800">Profil Pengguna</h2><p class="mt-1 text-xs text-slate-400">Informasi identitas akun</p></div></div>
+        </div>
+        <form method="post" action="/account/profile" class="space-y-4 p-5">
+          <input type="hidden" name="_csrf" value="{{.CSRF}}">
+          <label class="block"><span class="form-label">Nama lengkap</span><span class="relative block"><i class="fa-regular fa-user pointer-events-none absolute left-3.5 top-3 text-slate-400"></i><input required name="name" value="{{.User.Name}}" class="form-input pl-10"></span></label>
+          <label class="block"><span class="form-label">Alamat email</span><span class="relative block"><i class="fa-regular fa-envelope pointer-events-none absolute left-3.5 top-3 text-slate-400"></i><input required type="email" name="email" value="{{.User.Email}}" class="form-input pl-10"></span></label>
+          <button class="btn-primary w-full"><i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Profil</button>
+        </form>
+      </section>
+
+      <div class="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-xs leading-5 text-blue-700"><i class="fa-solid fa-circle-info mr-2"></i>Gunakan email aktif karena tautan pemulihan kata sandi dikaitkan dengan alamat ini.</div>
+    </aside>
+
+    <section class="dashboard-card">
+      <div class="border-b border-slate-100 p-5 sm:px-6"><div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center rounded-xl bg-violet-100 text-violet-600"><i class="fa-solid fa-lock"></i></span><div><h2 class="font-bold text-slate-800">Ganti Kata Sandi</h2><p class="mt-1 text-xs text-slate-400">Seluruh perangkat akan dikeluarkan setelah kata sandi berubah</p></div></div></div>
+      <form method="post" action="/account/password" class="p-5 sm:p-6">
+        <input type="hidden" name="_csrf" value="{{.CSRF}}">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="block sm:col-span-2"><span class="form-label">Kata sandi saat ini</span><span class="relative block"><i class="fa-solid fa-key pointer-events-none absolute left-3.5 top-3 text-slate-400"></i><input required type="password" name="current_password" class="form-input pl-10 pr-11" autocomplete="current-password"><button type="button" data-password-toggle class="password-toggle" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye"></i></button></span></label>
+          <label class="block"><span class="form-label">Kata sandi baru</span><span class="relative block"><i class="fa-solid fa-lock pointer-events-none absolute left-3.5 top-3 text-slate-400"></i><input required minlength="8" type="password" name="password" class="form-input pl-10 pr-11" autocomplete="new-password"><button type="button" data-password-toggle class="password-toggle" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye"></i></button></span></label>
+          <label class="block"><span class="form-label">Konfirmasi kata sandi</span><span class="relative block"><i class="fa-solid fa-shield-halved pointer-events-none absolute left-3.5 top-3 text-slate-400"></i><input required minlength="8" type="password" name="password_confirmation" class="form-input pl-10 pr-11" autocomplete="new-password"><button type="button" data-password-toggle class="password-toggle" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye"></i></button></span></label>
+        </div>
+        <div class="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between"><p class="text-xs text-slate-400"><i class="fa-solid fa-circle-check mr-1 text-emerald-500"></i>Minimal 8 karakter</p><button class="btn-primary px-5"><i class="fa-solid fa-key mr-2"></i>Perbarui Kata Sandi</button></div>
+      </form>
+    </section>
+  </div>
+
+  <section class="dashboard-card mt-6">
+    <div class="flex flex-col gap-4 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div class="flex items-center gap-3"><span class="grid h-11 w-11 place-items-center rounded-xl bg-emerald-100 text-emerald-600"><i class="fa-solid fa-laptop-shield"></i></span><div><h2 class="font-bold text-slate-800">Perangkat & Sesi Aktif</h2><p class="mt-1 text-xs text-slate-400">Tinjau perangkat yang memiliki akses ke akun Anda</p></div></div>
+      <form method="post" action="/account/sessions/logout-all" data-confirm="Keluarkan akun dari semua perangkat?"><input type="hidden" name="_csrf" value="{{.CSRF}}"><button class="rounded-lg border border-red-100 bg-red-50 px-3.5 py-2 text-xs font-semibold text-red-600 transition hover:border-red-200 hover:bg-red-100"><i class="fa-solid fa-right-from-bracket mr-2"></i>Logout Semua</button></form>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {{range .Content.Sessions}}
+      <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div class="flex min-w-0 items-center gap-4"><span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl {{if .IsCurrent}}bg-emerald-50 text-emerald-600{{else}}bg-slate-100 text-slate-500{{end}}"><i class="fa-solid fa-laptop"></i></span><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><strong class="text-sm text-slate-800">{{.IPAddress}}</strong>{{if .IsCurrent}}<span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Perangkat ini</span>{{end}}</div><p class="mt-1 max-w-2xl truncate text-xs text-slate-400" title="{{.UserAgent}}">{{.UserAgent}}</p><p class="mt-1 text-[10px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>Masuk {{.CreatedAt}}</p></div></div>
+        {{if not .IsCurrent}}<form method="post" action="/account/sessions/{{.ID}}/revoke" data-confirm="Keluarkan sesi ini?"><input type="hidden" name="_csrf" value="{{$.CSRF}}"><button class="inline-flex h-9 items-center gap-2 rounded-lg border border-red-100 px-3 text-xs font-semibold text-red-600 hover:bg-red-50"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></form>{{end}}
+      </div>
+      {{else}}<div class="p-8 text-center text-sm text-slate-400">Tidak ada sesi aktif.</div>{{end}}
+    </div>
+  </section>
+</div>
+{{end}}

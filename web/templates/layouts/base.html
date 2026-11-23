@@ -21,7 +21,7 @@
           </button>
           <div id="account-menu" role="menu" x-cloak x-show="profile" x-transition.origin.top.right class="profile-menu" style="display:none">
             <div class="border-b border-slate-100 px-4 py-3"><p class="truncate text-sm font-semibold">{{.User.Name}}</p><p class="truncate text-xs text-slate-400">{{.User.Email}}</p></div>
-            <form action="/logout" method="post" class="p-2"><input type="hidden" name="_csrf" value="{{.CSRF}}"><button class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-arrow-right-from-bracket"></i>Keluar dari akun</button></form>
+            <div class="p-2"><a href="/account" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"><i class="fa-solid fa-user-shield"></i>Profil & Keamanan</a><form action="/logout" method="post"><input type="hidden" name="_csrf" value="{{.CSRF}}"><button class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-arrow-right-from-bracket"></i>Keluar dari akun</button></form></div>
           </div>
         </div>
       </div>

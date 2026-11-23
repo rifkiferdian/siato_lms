@@ -41,6 +41,21 @@ document.addEventListener('submit', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const input = button.parentElement.querySelector('input');
+      if (!input) return;
+      const visible = input.type === 'text';
+      input.type = visible ? 'password' : 'text';
+      button.setAttribute('aria-label', visible ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi');
+      const icon = button.querySelector('i');
+      if (icon) {
+        icon.classList.toggle('fa-eye', visible);
+        icon.classList.toggle('fa-eye-slash', !visible);
+      }
+    });
+  });
+
   const lecturerForm = document.querySelector('form[action$="/lecturers"]');
   if (lecturerForm) {
     const classID = lecturerForm.action.split('/').slice(-2,-1)[0];

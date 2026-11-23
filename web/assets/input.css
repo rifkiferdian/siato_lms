@@ -5,6 +5,8 @@
 /* Keep icon-bearing search fields clear of their leading icon. The compound
    selector also outranks the base form-input horizontal padding. */
 .form-input.pl-11{padding-left:calc(var(--spacing)*11)}
+.form-input.pl-10{padding-left:calc(var(--spacing)*10)}
+.form-input.pr-11{padding-right:calc(var(--spacing)*11)}
 form:is([action="/admin/academics/years"],[action="/admin/academics/semesters"],[action="/admin/academics/programs"],[action="/admin/academics/courses"]){padding:1rem!important}
 form:is([action="/admin/academics/years"],[action="/admin/academics/semesters"],[action="/admin/academics/programs"],[action="/admin/academics/courses"])>label{display:block}
 form:is([action="/admin/academics/years"],[action="/admin/academics/semesters"],[action="/admin/academics/programs"],[action="/admin/academics/courses"])> :not([hidden])~ :not([hidden]){margin-top:.75rem!important}
@@ -27,7 +29,7 @@ form:is([action="/admin/academics/years"],[action="/admin/academics/semesters"],
 .login-input-wrap{@apply relative flex items-center}
 .login-input-wrap>i{@apply pointer-events-none absolute left-4 text-slate-400}
 .login-input{@apply h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10}
-.password-toggle{@apply absolute right-1 grid h-10 w-10 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700}
+.password-toggle{@apply absolute right-1.5 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-sm text-slate-400 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20}
 .login-submit{@apply flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-blue-600 px-5 font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 active:translate-y-0}
 
 [x-cloak]{display:none!important}

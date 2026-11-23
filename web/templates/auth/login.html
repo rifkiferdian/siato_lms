@@ -51,7 +51,7 @@
           <span class="form-label">Kata sandi</span>
           <span class="login-input-wrap"><i class="fa-solid fa-lock"></i><input class="login-input pr-12" :type="showPassword ? 'text' : 'password'" name="password" autocomplete="current-password" required minlength="8" placeholder="Masukkan kata sandi"><button type="button" class="password-toggle" @click="showPassword=!showPassword" :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"><i class="fa-regular" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i></button></span>
         </label>
-        <div class="flex items-center gap-2 text-xs text-slate-500"><i class="fa-solid fa-circle-info text-blue-500"></i><span>Lupa kata sandi? Hubungi administrator akademik kampus.</span></div>
+        <div class="flex justify-end"><a href="/forgot-password" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Lupa kata sandi?</a></div>
         <button class="login-submit" type="submit"><span>Masuk ke LMS</span><i class="fa-solid fa-arrow-right"></i></button>
       </form>
 

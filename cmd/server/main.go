@@ -44,11 +44,11 @@ func main() {
 		os.Exit(1)
 	}
 	r.Static("/static", "./web/static")
-	sm := middleware.NewSessionManager(cfg.SessionSecret, cfg.CookieSecure, cfg.SessionMaxAge)
+	sm := middleware.NewSessionManager(cfg.SessionSecret, cfg.CookieSecure, cfg.SessionMaxAge, db)
 	r.Use(middleware.CSRF(sm))
 	views := view.New(sm, "./web/templates", cfg.AppName, db)
 	rbacService := rbac.NewService(db)
-	authHandler := auth.NewHandler(auth.NewService(auth.NewRepository(db)), rbacService, sm, views)
+	authHandler := auth.NewHandler(auth.NewService(auth.NewRepository(db)), rbacService, sm, views, cfg.BaseURL, cfg.Environment)
 	auth.RegisterRoutes(r, authHandler, sm)
 	dashboard.RegisterRoutes(r, dashboard.NewHandler(rbacService, sm, views, db), sm, rbacService)
 	scheduleHandler := schedules.NewHandler(schedules.NewService(schedules.NewRepository(db)), rbacService, sm, views, db)
