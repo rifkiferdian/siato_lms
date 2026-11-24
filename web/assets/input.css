@@ -94,3 +94,16 @@ section:has(.people-table)>div:first-child{border-bottom-width:0!important}
 .account-status{@apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold}.account-status i{@apply h-1.5 w-1.5 rounded-full}.account-status.active{@apply bg-emerald-50 text-emerald-600}.account-status.active i{@apply bg-emerald-500}.account-status.inactive{@apply bg-red-50 text-red-600}.account-status.inactive i{@apply bg-red-500}
 .table-action{@apply ml-auto grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600}
 .people-pagination{@apply flex flex-col gap-3 border-t border-slate-100 px-5 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between}.people-pagination strong{@apply font-semibold text-slate-700}.pagination-nav{@apply flex items-center gap-1}.pagination-nav a,.pagination-nav span{@apply grid h-9 min-w-9 place-items-center rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-600 transition}.pagination-nav a:hover{@apply border-blue-200 bg-blue-50 text-blue-600}.pagination-nav span.active{@apply border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-200}.pagination-nav span.disabled{@apply cursor-not-allowed bg-slate-50 text-slate-300}
+
+/* CPMK cards */
+.dashboard-card:has([data-modal="cpmk-modal"]){@apply bg-slate-50/70}
+.dashboard-card:has([data-modal="cpmk-modal"])>.card-heading{@apply bg-white}
+article:has(>[data-modal="cpmk-modal"]){@apply relative m-3 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 sm:m-4 sm:p-5}
+article:has(>[data-modal="cpmk-modal"]):before{content:"";@apply absolute inset-y-0 left-0 w-1 bg-blue-500}
+article:has(>[data-modal="cpmk-modal"]):hover{@apply -translate-y-0.5 border-blue-200 shadow-md shadow-blue-100/70}
+article:has(>[data-modal="cpmk-modal"])>div:first-child{@apply min-w-0 flex-1 items-start}
+article:has(>[data-modal="cpmk-modal"])>div:first-child>span{@apply h-12 min-w-20 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-md shadow-blue-200}
+article:has(>[data-modal="cpmk-modal"]) strong{@apply block text-[15px] font-bold leading-5 text-slate-800}
+article:has(>[data-modal="cpmk-modal"]) p{@apply mt-2 max-w-3xl text-sm leading-6 text-slate-500}
+article:has(>[data-modal="cpmk-modal"])>.academic-edit-button{@apply self-start bg-white}
+@media (max-width:639px){article:has(>[data-modal="cpmk-modal"]){@apply flex-col}article:has(>[data-modal="cpmk-modal"])>.academic-edit-button{@apply ml-20 w-fit}}
