@@ -122,6 +122,16 @@ document.addEventListener('DOMContentLoaded', function () {
         cell.textContent = String((page - 1) * 20 + index + 1);
         cell.className = 'text-center font-semibold text-slate-400';
         row.prepend(cell);
+        const editButton = row.querySelector('[data-academic-edit][data-action^="/admin/courses/"]');
+        const match = editButton && editButton.dataset.action.match(/\/admin\/courses\/(\d+)$/);
+        const courseCell = row.children[1];
+        if (match && courseCell) {
+          const link = document.createElement('a');
+          link.href = '/admin/courses/' + match[1];
+          link.className = 'block rounded-lg hover:text-blue-600';
+          while (courseCell.firstChild) link.appendChild(courseCell.firstChild);
+          courseCell.appendChild(link);
+        }
       });
     }
 
@@ -170,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const form = modal.querySelector('form');
       form.reset();
       form.action = button.dataset.action;
+      if (button.dataset.modal === 'cpmk-modal' && button.dataset.action.endsWith('/cpmk')) button.dataset.sortOrder = String((Number(button.dataset.sortOrder) || 0) + 1);
       form.querySelectorAll('[name]').forEach(function (field) {
         if (field.name === '_csrf') return;
         const key = field.name.replace(/_([a-z])/g, function (_, letter) { return letter.toUpperCase(); });

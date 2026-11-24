@@ -17,6 +17,7 @@ import (
 	"siato_lms/internal/modules/dashboard"
 	"siato_lms/internal/modules/people"
 	"siato_lms/internal/modules/rbac"
+	"siato_lms/internal/modules/rps"
 	"siato_lms/internal/modules/schedules"
 	"siato_lms/internal/modules/usermanagement"
 	"siato_lms/internal/shared/view"
@@ -63,6 +64,8 @@ func main() {
 	academics.RegisterRoutes(r, academicHandler, sm, rbacService)
 	courseCatalogHandler := coursecatalog.NewHandler(coursecatalog.NewService(coursecatalog.NewRepository(db)), rbacService, sm, views, db)
 	coursecatalog.RegisterRoutes(r, courseCatalogHandler, sm, rbacService)
+	rpsHandler := rps.NewHandler(rps.NewService(rps.NewRepository(db)), rbacService, sm, views, db)
+	rps.RegisterRoutes(r, rpsHandler, sm, rbacService)
 	r.GET("/", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/dashboard") })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
 	server := &http.Server{Addr: cfg.Address, Handler: r, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}

@@ -1,0 +1,12 @@
+ALTER TABLE course_rps ADD COLUMN course_id BIGINT UNSIGNED NULL AFTER id;
+UPDATE course_rps r JOIN course_classes cc ON cc.id=r.class_id SET r.course_id=cc.course_id;
+ALTER TABLE course_rps MODIFY course_id BIGINT UNSIGNED NOT NULL;
+UPDATE course_rps r JOIN (SELECT course_id,version FROM course_rps GROUP BY course_id,version HAVING COUNT(*)>1) d ON d.course_id=r.course_id AND d.version=r.version SET r.version=CONCAT(r.version,'-K',r.class_id);
+ALTER TABLE course_classes ADD COLUMN rps_id BIGINT UNSIGNED NULL AFTER semester_id;
+UPDATE course_classes cc JOIN course_rps r ON r.class_id=cc.id SET cc.rps_id=r.id;
+ALTER TABLE course_classes ADD CONSTRAINT fk_class_rps FOREIGN KEY(rps_id) REFERENCES course_rps(id) ON DELETE SET NULL;
+ALTER TABLE course_rps DROP FOREIGN KEY fk_rps_class;
+ALTER TABLE course_rps DROP INDEX uq_rps_class;
+ALTER TABLE course_rps DROP COLUMN class_id;
+ALTER TABLE course_rps ADD CONSTRAINT fk_rps_course FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE;
+ALTER TABLE course_rps ADD UNIQUE KEY uq_rps_course_version(course_id,version);

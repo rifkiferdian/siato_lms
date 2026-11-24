@@ -1,0 +1,33 @@
+CREATE TABLE course_rps (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ class_id BIGINT UNSIGNED NOT NULL,
+ version VARCHAR(30) NOT NULL DEFAULT '1.0',
+ description TEXT NULL,
+ learning_methods TEXT NULL,
+ main_references TEXT NULL,
+ supporting_references TEXT NULL,
+ status ENUM('draft','active') NOT NULL DEFAULT 'draft',
+ activated_at DATETIME NULL,
+ created_by BIGINT UNSIGNED NOT NULL,
+ updated_by BIGINT UNSIGNED NOT NULL,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_rps_class(class_id),
+ CONSTRAINT fk_rps_class FOREIGN KEY(class_id) REFERENCES course_classes(id) ON DELETE CASCADE,
+ CONSTRAINT fk_rps_created_user FOREIGN KEY(created_by) REFERENCES users(id),
+ CONSTRAINT fk_rps_updated_user FOREIGN KEY(updated_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE rps_cpmk (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ rps_id BIGINT UNSIGNED NOT NULL,
+ code VARCHAR(30) NOT NULL,
+ title VARCHAR(200) NOT NULL,
+ description TEXT NOT NULL,
+ sort_order SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+ created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE KEY uq_rps_cpmk_code(rps_id,code),
+ KEY idx_rps_cpmk_order(rps_id,sort_order),
+ CONSTRAINT fk_cpmk_rps FOREIGN KEY(rps_id) REFERENCES course_rps(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

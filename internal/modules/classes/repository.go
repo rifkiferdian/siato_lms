@@ -125,10 +125,10 @@ func (r *Repository) Options() ([]Option, []Option, error) {
 	return courses, semesters, e
 }
 func (r *Repository) Create(in CreateInput) error {
-	return r.db.Exec("INSERT INTO course_classes(course_id,semester_id,name,description,capacity,max_meetings,status) VALUES(?,?,?,?,?,?,?)", in.CourseID, in.SemesterID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status).Error
+	return r.db.Exec("INSERT INTO course_classes(course_id,semester_id,rps_id,name,description,capacity,max_meetings,status) VALUES(?,?,(SELECT id FROM course_rps WHERE course_id=? AND status='active' ORDER BY activated_at DESC LIMIT 1),?,?,?,?,?)", in.CourseID, in.SemesterID, in.CourseID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status).Error
 }
 func (r *Repository) Update(id uint64, in CreateInput) error {
-	return r.db.Exec("UPDATE course_classes SET course_id=?,semester_id=?,name=?,description=?,capacity=?,max_meetings=?,status=? WHERE id=?", in.CourseID, in.SemesterID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status, id).Error
+	return r.db.Exec("UPDATE course_classes SET course_id=?,semester_id=?,rps_id=(SELECT id FROM course_rps WHERE course_id=? AND status='active' ORDER BY activated_at DESC LIMIT 1),name=?,description=?,capacity=?,max_meetings=?,status=? WHERE id=?", in.CourseID, in.SemesterID, in.CourseID, in.Name, in.Description, in.Capacity, in.MaxMeetings, in.Status, id).Error
 }
 func (r *Repository) Lecturers(classID uint64) ([]LecturerOption, error) {
 	var rows []LecturerOption
